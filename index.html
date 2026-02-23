@@ -3,602 +3,602 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battery Reference Explorer</title>
-    <!-- Tailwind CSS -->
+    <title>Battery Chemistries Reference Project</title>
+    <meta name="description" content="A Scientific Overview: Chemistry, Advantages, Disadvantages & Applications of 300+ Battery Technologies">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; }
+        .sticky-header th { position: sticky; top: 0; z-index: 10; }
+        
+        /* Custom scrollbar for table and sidebar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .row-enter { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col md:flex-row overflow-x-hidden">
+<body class="bg-slate-100 text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
 
-    <!-- Mobile Header overlay -->
-    <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#1F3864] text-white flex items-center justify-between px-4 z-50 shadow-md">
-        <div class="flex items-center gap-2 font-bold">
-            <i data-lucide="battery" class="w-6 h-6"></i>
-            <span class="truncate">Battery Explorer</span>
+    <!-- Header Section (Fixed height) -->
+    <header class="flex-none bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-md z-20 relative">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="p-2 bg-blue-500/20 rounded-lg border border-blue-400/30">
+                            <i data-lucide="battery-charging" class="w-6 h-6 text-blue-400"></i>
+                        </div>
+                        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-50">
+                            Battery Chemistries Reference Project
+                        </h1>
+                    </div>
+                    <p class="text-sm md:text-base text-slate-400 max-w-3xl flex items-center space-x-2">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        <span>300+ Technologies Across 24 Categories | Based on Peer-Reviewed Literature</span>
+                    </p>
+                </div>
+                
+                <!-- Search moved to header area for better use of space -->
+                <div class="relative w-full md:w-80">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="h-4 w-4 text-slate-400"></i>
+                    </div>
+                    <input type="text" id="searchInput" 
+                        class="block w-full pl-10 pr-3 py-2.5 border border-slate-600 rounded-lg leading-5 bg-slate-800/50 text-white placeholder-slate-400 focus:outline-none focus:bg-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm shadow-inner" 
+                        placeholder="Search technologies, chemistry, etc...">
+                </div>
+            </div>
         </div>
-        <button id="mobile-menu-btn" class="p-2 hover:bg-white/10 rounded-lg">
-            <i data-lucide="menu" id="menu-icon" class="w-6 h-6"></i>
-        </button>
+    </header>
+
+    <!-- App Layout Container -->
+    <div class="flex-1 min-h-0 max-w-screen-2xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6">
+        
+        <!-- Interactive Sidebar -->
+        <aside class="w-full md:w-72 flex-none flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden h-48 md:h-full transition-all">
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex-none">
+                <h2 class="font-semibold text-slate-700 flex items-center text-sm uppercase tracking-wider">
+                    <i data-lucide="list-tree" class="w-4 h-4 mr-2 text-slate-500"></i> Categories
+                </h2>
+            </div>
+            <div class="overflow-y-auto flex-1 p-3 space-y-1 custom-scrollbar" id="categorySidebar">
+                <!-- Sidebar buttons populated by JavaScript -->
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 min-w-0 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden h-full">
+            
+            <!-- Table Header Info -->
+            <div class="flex-none p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <h3 class="font-medium text-slate-800 text-lg flex items-center" id="currentCategoryTitle">
+                    All Categories
+                </h3>
+                <div class="text-sm px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-medium border border-blue-100" id="resultsCount">
+                    Loading data...
+                </div>
+            </div>
+
+            <!-- Data Table Container -->
+            <div class="flex-1 min-h-0 overflow-auto relative custom-scrollbar">
+                <table class="min-w-full divide-y divide-slate-200 w-full text-left border-collapse">
+                    <thead class="bg-slate-100 sticky-header shadow-sm">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider w-1/5 border-b border-slate-200">
+                                Chemistry / Name
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider w-1/4 border-b border-slate-200">
+                                Description & Formula
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-xs font-bold text-green-700 uppercase tracking-wider w-1/5 border-b border-slate-200 bg-green-50/50">
+                                Key Advantages
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-xs font-bold text-red-700 uppercase tracking-wider w-1/5 border-b border-slate-200 bg-red-50/50">
+                                Key Disadvantages
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200">
+                                Applications
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="bg-white divide-y divide-slate-100">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+                
+                <!-- Empty State -->
+                <div id="emptyState" class="hidden absolute inset-0 bg-white flex-col items-center justify-center py-16 text-slate-500 z-10">
+                    <i data-lucide="file-question" class="w-16 h-16 text-slate-300 mb-4"></i>
+                    <p class="text-lg font-medium">No technologies found.</p>
+                    <p class="text-sm text-slate-400 mt-1">Try adjusting your search or category filter.</p>
+                    <button onclick="clearSearchAndFilters()" class="mt-4 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 font-medium text-sm transition-colors">
+                        Clear All Filters
+                    </button>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar" class="fixed md:sticky top-0 left-0 h-screen w-72 bg-white border-r border-slate-200 shadow-sm z-40 transform transition-transform duration-300 ease-in-out flex flex-col -translate-x-full md:translate-x-0 pt-16 md:pt-0">
-        <div class="p-6 border-b border-slate-100 hidden md:block shrink-0">
-            <div class="flex items-center gap-3 text-[#1F3864] mb-2">
-                <i data-lucide="battery" class="w-8 h-8"></i>
-                <h1 class="text-xl font-bold leading-tight">Battery Explorer</h1>
-            </div>
-            <p class="text-xs text-slate-500 font-medium tracking-wide uppercase">Reference Guide 2024</p>
-        </div>
-
-        <div class="p-4 flex-1 overflow-y-auto">
-            <div class="mb-4 text-xs font-bold text-slate-400 uppercase tracking-wider px-2">Table of Contents</div>
-            <nav id="sidebar-nav" class="flex flex-col gap-1">
-                <!-- Navigation items injected here via JS -->
-            </nav>
-        </div>
-        
-        <div class="p-4 border-t border-slate-100 shrink-0 bg-slate-50">
-            <div class="flex items-center gap-2 text-xs text-slate-500">
-                <i data-lucide="book-open" class="w-4 h-4"></i>
-                <span>Based on 300+ Peer-Reviewed Papers</span>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 min-w-0 pt-16 md:pt-0 flex flex-col min-h-screen">
-        
-        <!-- Top Search Bar & Header -->
-        <header class="sticky top-0 md:top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 md:px-8 py-4 shadow-sm">
-            <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-[#1F3864] hidden md:block">Scientific Overview</h2>
-                    <p class="text-sm text-slate-500 hidden md:block">Chemistry, Advantages, Disadvantages & Applications</p>
-                </div>
-                
-                <div class="relative w-full md:w-96 group">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#2E75B6] transition-colors">
-                        <i data-lucide="search" class="h-5 w-5"></i>
-                    </div>
-                    <input
-                        id="search-input"
-                        type="text"
-                        placeholder="Search chemistries, applications..."
-                        class="w-full pl-10 pr-10 py-2.5 bg-slate-100 border border-transparent rounded-xl text-sm focus:bg-white focus:border-[#2E75B6] focus:ring-4 focus:ring-[#2E75B6]/10 transition-all outline-none"
-                    />
-                    <button 
-                        id="clear-search"
-                        class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
-                    >
-                        <i data-lucide="x" class="h-4 w-4"></i>
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Content Listing -->
-        <div class="flex-1 p-4 md:p-8">
-            <div id="content-container" class="max-w-5xl mx-auto space-y-12 pb-24">
-                <!-- Content injected here via JS -->
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="bg-[#1F3864] text-slate-300 py-12 px-4 md:px-8 mt-auto border-t-4 border-[#2E75B6]">
-            <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                <div class="flex items-center gap-3 opacity-80">
-                    <i data-lucide="battery" class="w-8 h-8"></i>
-                    <div>
-                        <p class="font-bold text-white text-lg">Battery Reference Project</p>
-                        <p class="text-sm">Comprehensive compendium of electrochemical storage</p>
-                    </div>
-                </div>
-                <div class="max-w-xl text-center md:text-right text-xs opacity-70 leading-relaxed">
-                    <p>Sources: Peer-reviewed literature including Journal of Power Sources, Nature Energy, ACS Energy Letters, Advanced Energy Materials, Electrochimica Acta, and Joule.</p>
-                    <p class="mt-1">Data reflects scientific consensus as of 2024.</p>
-                </div>
-            </div>
-        </footer>
-
-    </main>
-
-    <!-- Scroll to Top Button -->
-    <button
-        id="scroll-top-btn"
-        class="fixed bottom-8 right-8 p-3 bg-[#2E75B6] text-white rounded-full shadow-lg shadow-blue-900/20 hover:bg-[#1F3864] hover:-translate-y-1 transition-all z-50 opacity-0 invisible"
-        aria-label="Scroll to top"
-    >
-        <i data-lucide="arrow-up" class="w-5 h-5"></i>
-    </button>
-
-    <!-- Overlay for mobile sidebar -->
-    <div 
-        id="mobile-overlay"
-        class="fixed inset-0 bg-slate-900/50 z-30 md:hidden backdrop-blur-sm hidden"
-    ></div>
+    <!-- Raw Data Embed -->
+    <script type="text/template" id="csv-data">
+Chemistry/Name,Description & Formula,Key Advantages,Key Disadvantages,Applications
+1. Primary (Non-Rechargeable) Batteries,,,,
+1.1 Zinc-Based Primary,,,,
+Alkaline Battery (Zn-MnO₂),"Zn + 2MnO₂ → ZnO + Mn₂O₃ (alkaline electrolyte, KOH). Powdered Zn anode, MnO₂ cathode.","High energy density, long shelf life, low cost, widely available, good low-temp performance","Non-rechargeable, MnO₂ limited capacity, voltage drops under heavy load","Flashlights, remote controls, toys, clocks, portable electronics"
+Zinc–Carbon Battery (Leclanché Cell),Zn → Zn²⁺ + 2e⁻; 2MnO₂ + 2NH₄⁺ + 2e⁻ → Mn₂O₃ + 2NH₃ + H₂O. NH₄Cl/ZnCl₂ electrolyte.,"Very low cost, simple construction, globally produced","Low energy density, poor performance in cold/heavy drain, short shelf life","Low-drain devices: clocks, remote controls, flashlights"
+Zinc–Chloride Battery (Heavy-Duty),"Similar to Leclanché but ZnCl₂ electrolyte. Zn anode, MnO₂ cathode, improved current delivery.","Better than Zn-C, improved heavy-drain, low cost","Still inferior to alkaline, limited shelf life","Flashlights, toys, moderate drain applications"
+Zinc–Air Battery (Primary),Zn + ½O₂ → ZnO; uses atmospheric O₂ as cathode reactant. KOH electrolyte.,"Very high energy density (~1086 Wh/kg theoretical), flat discharge, long shelf life sealed","Sensitive to humidity/CO₂, limited power output, non-rechargeable","Hearing aids, medical devices, remote sensors"
+Zinc–Mercuric Oxide Battery,Zn + HgO → ZnO + Hg. KOH electrolyte. Very flat discharge curve.,"Extremely stable voltage, long shelf life, high energy density","Mercury toxicity, environmental hazard, banned in many countries","Historic: pacemakers, military, precision instruments (largely obsolete)"
+Zinc–Silver Oxide Battery,Zn + Ag₂O → ZnO + 2Ag. Alkaline electrolyte. Flat 1.55V discharge.,"High energy density, very stable voltage, compact","High cost (silver), non-rechargeable","Watches, hearing aids, calculators, cameras"
+1.2 Lithium Primary,,,,
+Lithium–MnO₂ (Li-MnO₂),Li + MnO₂ → LiMnO₂. Organic electrolyte (LiClO₄ in propylene carbonate). 3V nominal.,"High energy density, wide temperature range, long shelf life (10+ yr), low self-discharge","Non-rechargeable, moderate cost, organic electrolyte flammability","Cameras, medical devices, military, smoke detectors"
+Lithium–CFx (Li-CFx),Li + (CF)ₙ → LiF + C. 2.8–3.0V. Highest gravimetric energy density of primary Li cells (~2100 Wh/kg theoretical).,"Highest energy density, ultra-low self-discharge, excellent shelf life","Non-rechargeable, expensive, voltage delay under pulse load","Military, aerospace, implantable medical, oceanographic sensors"
+Lithium–FeS₂ (Li-FeS₂),4Li + FeS₂ → 2Li₂S + Fe. 1.5V (AA compatible). Organic electrolyte.,"Drop-in AA replacement, higher energy than alkaline, wide temp range","Non-rechargeable, slight cost premium over alkaline","High-performance cameras, digital devices, outdoor electronics"
+Lithium–SOCl₂ (Li-SOCl₂),4Li + 2SOCl₂ → 4LiCl + S + SO₂. 3.6V. Highest volumetric energy density among primary cells.,"Extremely high energy density, widest temp range (−60 to +85°C), 20+ yr shelf life","Non-rechargeable, toxic electrolyte, voltage delay","Utility meters, GPS trackers, military, industrial IoT"
+Lithium–SO₂Cl₂ (Li-SO₂Cl₂),"2Li + SO₂Cl₂ → 2LiCl + SO₂. 3.9V, very high energy density.","Highest voltage among primary Li, excellent low-temp performance","Highly toxic electrolyte, pressurized cell, limited commercial use",Specialized military and aerospace applications
+Lithium–SO₂ (Li-SO₂),"2Li + 2SO₂ → Li₂S₂O₄. 2.9–3.0V. Liquid SO₂ cathode, dissolved in organic solvent.","Excellent low-temp performance, high energy density, flat discharge","Toxic SO₂, pressurized cell, safety concerns","Military communications, low-temperature remote deployments"
+Lithium–Iodine (Primary),2Li + I₂ → 2LiI. Solid-state. 2.8V. Forms LiI electrolyte in situ.,"Extremely high reliability, 10+ yr lifetime, hermetically sealed, self-healing electrolyte",Very low power output (solid electrolyte limits rate),Cardiac pacemakers (primary application since 1972)
+Lithium–CuO (Li-CuO),"2Li + CuO → Li₂O + Cu. 1.5V, high energy density.","Long shelf life, high volumetric energy density, thermally stable","Non-rechargeable, limited rate capability","Military, professional electronics, remote monitoring"
+Lithium–Silver Vanadium Oxide (Li-SVO),Li + Ag₂V₄O₁₁ → LiAg₂V₄O₁₁ (multi-step). 3.2V average. Hybrid cathode.,"Exceptional pulse power + high energy density, reliable over years","High cost (silver), non-rechargeable","Implantable cardioverter-defibrillators (ICDs), cardiac devices"
+Lithium Metal Battery (Primary),Li anode + various cathodes (general). High voltage due to Li's low reduction potential (−3.04V vs SHE).,"High energy density, wide chemistry options, long shelf life","Non-rechargeable in primary form, safety concerns with lithium metal","Consumer electronics, military, medical, industrial"
+Lithium–Sulfuryl Chloride (Li-SO₂Cl₂),Already listed above as Li-SO₂Cl₂ — see entry above.,Same as Li-SO₂Cl₂,Same as Li-SO₂Cl₂,"Aerospace, military"
+1.3 Magnesium & Aluminum Primary,,,,
+Magnesium Primary (Mg-MnO₂),Mg + MnO₂ → MgO + Mn. 1.6–2.0V. Seawater or salt electrolyte.,"Higher voltage than Zn-C, long shelf life, lightweight","Self-discharge in humid air, voltage delay, limited temp range","Military, reserve applications, emergency use"
+Magnesium–Silver Chloride (Water-Activated),Mg + 2AgCl → MgCl₂ + 2Ag. Seawater electrolyte activates on immersion. 1.5V.,"Indefinite shelf life (dry), immediate activation in seawater, high power density","Single-use, requires seawater, not rechargeable","Naval torpedoes, sonobuoys, underwater emergency beacons"
+Zinc–Silver Chloride (Water-Activated),Zn + 2AgCl → ZnCl₂ + 2Ag. Similar to Mg-AgCl but Zn anode. 1.0V.,"Long dry shelf life, reliable seawater activation","Lower energy than Mg-AgCl, single-use","Marine rescue beacons, underwater sensors, sonobuoys"
+Aluminum–Air Battery (Primary),Al + 3/4O₂ + 3/2H₂O → Al(OH)₃. 1.2–1.6V. High theoretical energy density (~8100 Wh/kg).,"Extremely high energy density, abundant aluminum, lightweight","Self-corrosion (parasitic reaction), non-rechargeable, electrolyte management","Emergency power, military, range extenders for EVs (research)"
+1.4 Specialty & Other Primary,,,,
+Mercury Battery (Primary),Zn + HgO → ZnO + Hg. 1.35V extremely stable. KOH electrolyte.,"Perfectly flat discharge, high energy density, long shelf life","Mercury toxicity, environmental ban in most countries, non-rechargeable","Historic: hearing aids, military, medical (now largely banned)"
+Silver-Oxide Battery (Primary),Zn + Ag₂O → ZnO + 2Ag. 1.55V flat discharge. Alkaline electrolyte.,"Very stable voltage, compact, high energy density for size","High silver cost, non-rechargeable","Watches, hearing aids, button cell devices"
+Nickel Oxyhydroxide Battery,Zn + 2NiOOH + H₂O → Zn(OH)₂ + 2Ni(OH)₂. 1.7V. Alkaline electrolyte.,"Higher voltage/power than standard alkaline, excellent for digital cameras","Premium cost over alkaline, non-rechargeable","Digital cameras, high-drain electronics"
+Oxyride Battery,Panasonic's improved alkaline using NiO(OH)/MnO₂ mixed cathode. ~1.7V initial.,Better high-drain performance than standard alkaline,"Slightly higher cost, non-rechargeable, discontinued","Digital cameras, high-drain portables (largely discontinued)"
+Water-Activated Battery,"Various anodes (Mg, Al, Zn) activated by water/seawater as electrolyte.","Unlimited shelf life (dry storage), instant field activation","Single-use, electrolyte dependent on environment","Emergency beacons, military, oceanographic instruments"
+Air-Depolarized Battery,Metal anode (typically Zn) + atmospheric O₂ cathode. General category.,"High energy density (O₂ from air, not stored), lightweight","Limited power density, humidity sensitivity","Long-duration remote sensors, hearing aids"
+Thermal Reserve Battery (Pyrotechnic),"Molten salt electrolyte activated by pyrotechnic heat source. Various chemistries (e.g., Li-FeS₂ at high temp).","Indefinite shelf life, instant high-power activation, wide temperature range","Single-use, activation is irreversible, requires pyrotechnic trigger","Missiles, ejection seats, artillery fuses, aerospace"
+Paper Battery (Primary),Thin cellulose substrate with Zn/MnO₂ or similar chemistry. Flexible architecture.,"Ultra-thin, flexible, biodegradable substrate, lightweight","Low energy density, prototype stage for many variants","RFID tags, smart packaging, disposable medical sensors"
+Melanin Battery (Bioelectronic),Melanin polymer electrode (eumelanin) in aqueous electrolyte. Stores charge via ion coordination.,"Biocompatible, biodegradable, non-toxic, edible-grade materials","Very low energy density, early research stage","Ingestible electronics, biomedical sensors, transient devices"
+Riboflavin (Vitamin B2) Battery,Riboflavin as redox-active cathode material in aqueous system. ~−0.2V vs. Ag/AgCl.,"Non-toxic, biocompatible, derived from vitamin B2, safe for ingestion","Very low performance, highly experimental","Ingestible diagnostic sensors, bioelectronic devices"
+1.5 Historical & Classical Cells,,,,
+Voltaic Pile,"Zn/Cu discs with brine-soaked cloth. First true battery (Volta, 1800). Zn + Cu²⁺ → Zn²⁺ + Cu.","First practical electrochemical power source, historically foundational","Very low energy density, rapid polarization, not practical today","Historical demonstrations, education"
+Daniell Cell,Zn | ZnSO₄ || CuSO₄ | Cu. 1.1V. First practical and reliable cell (1836).,"Stable 1.1V, non-polarizing, practical for telegraphy","Not portable, liquid electrolyte, self-discharge","Historic telegraphy, electroplating, educational demonstrations"
+Gravity Cell (Crowfoot Cell),Variant of Daniell with ZnSO₄ floating on CuSO₄ by density. Self-maintaining.,"Low maintenance, self-restoring electrolyte gradient","Fragile, positional dependency, obsolete",19th-century telegraphy
+Grove Cell,Zn | H₂SO₄ || HNO₃ | Pt. ~1.9V. High voltage but toxic gases.,"Very high EMF for its era, capable of high currents","Toxic NO₂ gas evolution, platinum cathode, impractical today","Early telegraphy, electrolysis experiments (historical)"
+Bunsen Cell,Zn | H₂SO₄ || HNO₃ | carbon. Cheaper Grove variant using carbon instead of Pt.,"Lower cost than Grove, adequate performance for 19th-century use","Toxic fumes, carbon electrode, obsolete","Arc lamps, early electrochemistry (historical)"
+Leclanché Cell (Wet),Zn | NH₄Cl | MnO₂/C. 1.5V. Predecessor of Zn-C dry cell (1866).,"Practical, no precious metals, commercially viable","Liquid electrolyte, not portable, polarizes under load",Early telegraphy and telephony (historical)
+Clark Cell,Zn | ZnSO₄ (sat.) | Hg₂SO₄ | Hg. 1.4328V at 15°C. Precise voltage standard.,"Extremely reproducible EMF, used as voltage standard","Not a practical power source, mercury, obsolete as standard",Historical voltage calibration standard
+Weston Cell,Cd | CdSO₄ (sat.) | Hg₂SO₄ | Hg. 1.01832V at 20°C. International voltage standard.,"Highly stable and reproducible EMF, international standard until 1990","Very low current, mercury, cadmium, replaced by electronic standards","Metrology, voltage calibration standard (historical)"
+Zamboni Pile,"Thousands of silver foil/zinc oxide paper discs. High voltage (~800V), near-zero current.","Extremely long life (Oxford Electric Bell, 150+ years), high voltage","Essentially zero current output, novelty/demonstration only","Oxford Electric Bell demonstration, early electrostatics research"
+Smee Cell,Zn | H₂SO₄ | platinized Ag. 0.5–0.7V. 1840s electroplating cell.,Suitable for sustained electroplating currents,"Low voltage, acid electrolyte, obsolete",19th-century electroplating (historical)
+Chromic Acid Cell (Poggendorff),Zn | H₂SO₄/K₂Cr₂O₇ | C. ~2.0V. Strong oxidizer depolarizes cathode.,"High voltage, no gas polarization, higher current than Grove","Toxic chromate, acid, obsolete",Early laboratory power (historical)
+Lalande Cell,Zn | NaOH | CuO. 0.9V. Edison improved version. Rechargeable copper oxide cathode.,"Reliable, long life, used in railways and early telegraphy","Low voltage, large and heavy, obsolete","Early railway signaling, stationary telegraph power (historical)"
+Lemon/Potato Battery,Zn nail + Cu coin in citric/phosphoric acid (fruit/vegetable electrolyte). ~0.5–1.0V.,"Educational demonstration, widely available materials","Extremely low power, not practical, perishable electrolyte",Science education demonstrations
+Earth Battery,Buried dissimilar metal electrodes (Fe/Cu) using soil electrolyte. 0.3–1.0V depending on soil.,"No external electrolyte needed, potentially continuous in moist soil","Very low and variable voltage, impractical for most uses","Historical telegraph experiments, curiosity/research"
+Dry Cell (General),Sealed Leclanché chemistry with paste electrolyte (ZnCl₂/NH₄Cl). 1.5V.,"Portable, no liquid spillage, mass-produced, low cost","Non-rechargeable (primary), limited heavy-drain performance","Universal portable power: flashlights, toys, remote controls"
+2. Lead-Based Batteries,,,,
+Lead–Acid (Flooded/Wet Cell),Pb + PbO₂ + 2H₂SO₄ → 2PbSO₄ + 2H₂O. 2V/cell. Flooded H₂SO₄ electrolyte.,"Very low cost, high surge current, reliable, fully recyclable (97%+)","Heavy, low energy density, requires maintenance, H₂ gassing","Automotive SLI, UPS, forklifts, stationary backup power"
+Deep-Cycle Lead–Acid,Same chemistry as flooded Pb-acid but thicker plates optimized for repeated deep discharge.,"Cost-effective for deep cycling, proven reliability, recyclable","Heavy, lower cycle life vs. Li-ion, requires ventilation","Golf carts, marine, renewable energy storage, floor scrubbers"
+VRLA Battery,Valve-regulated Pb-acid; recombinant O₂ cycle prevents gassing. Sealed. AGM or Gel variants.,"Maintenance-free, can be used in any orientation, low self-discharge","Less tolerant of overcharge, thermal runaway risk, shorter life than flooded","UPS, telecommunications, emergency lighting, medical equipment"
+AGM Lead–Acid,Pb-acid with electrolyte absorbed in fiberglass mat. Immobilized H₂SO₄. 2V/cell.,"Spill-proof, lower internal resistance, good high-current performance","More expensive than flooded, sensitive to overcharging","Start-stop vehicles, marine, motorcycle, premium UPS"
+Gel Lead–Acid,"Pb-acid with silica-gelled electrolyte. Immobilized, prevents stratification.","Excellent deep-discharge recovery, vibration resistant, safe","Slow charge rate, higher cost, poor high-rate performance","Wheelchairs, solar storage, marine, deep-cycle applications"
+Bipolar Lead–Acid,Bipolar plates (Pb on both sides) connecting cells in series internally. Reduced internal resistance.,"Higher power density, lower internal resistance, more compact","Manufacturing complexity, sealing challenges, less mature","Grid storage research, EV auxiliary power (emerging)"
+Advanced Lead–Carbon,Pb-acid with activated carbon added to negative plate. Hybrid behavior.,"Improved partial-state-of-charge operation, longer cycle life, faster charge","Still heavier than Li-ion, moderate energy density","Micro-hybrid vehicles, renewable energy buffer, grid storage"
+UltraBattery,Lead-acid negative plate with integrated supercapacitor layer (CSIRO design).,"High power bursts + energy storage, longer cycle life than standard Pb-acid","Complex manufacturing, niche market, cost premium","HEV mild hybrid, frequency regulation, renewable integration"
+Lead–Carbon Battery,Negative plate is predominantly carbon (graphite/activated carbon) with Pb. Distinct from Lead-Carbon hybrid.,"Excellent charge acceptance, long cycle life in PSoC, low sulfation","Lower energy density than Li-ion, still relatively heavy","Solar/wind storage, telecom backup, off-grid systems"
+Lead–Bismuth Battery,Small Bi addition to Pb grid alloy reduces hydrogen evolution and corrosion.,"Improved grid corrosion resistance, reduced gassing, longer life","Marginal improvement, niche use, still Pb chemistry limits","Long-life stationary applications, specialty Pb-acid variants"
+3. Nickel-Based Batteries,,,,
+Nickel–Cadmium (NiCd),Cd + 2NiOOH + 2H₂O → Cd(OH)₂ + 2Ni(OH)₂. 1.2V. KOH electrolyte.,"Robust, tolerates overcharge/deep discharge, wide temp range, long cycle life","Cadmium toxicity, memory effect, low energy density, banned in EU consumer use","Power tools (legacy), aviation, emergency lighting, industrial"
+NiCd Vented Cell,Same as NiCd but open vent for gas escape. Large format. 1.2V.,"Handles high charge rates, excellent high-temp performance, long service life","Cadmium hazard, requires maintenance and ventilation","Railway, submarine, aerospace, stationary industrial power"
+Nickel–Metal Hydride (NiMH),MH + NiOOH → M + Ni(OH)₂. 1.2V. AB₅ or AB₂ alloy hydrogen storage.,"Higher energy density than NiCd, no memory effect (moderate), no Cd toxicity","Higher self-discharge than Li-ion, less energy dense than Li-ion","HEV (Toyota Prius), consumer AA/AAA, digital cameras"
+Low Self-Discharge NiMH (LSD-NiMH),NiMH with modified separator/electrolyte. Eneloop-type. Retains 70–85% after 1 year.,"Ready-to-use from shelf, low self-discharge, rechargeable AA compatible","Slightly lower capacity than standard NiMH, moderate cost","Consumer electronics, remote controls, pre-charged retail batteries"
+Nickel–Iron (NiFe / Edison),Fe + 2NiOOH + 2H₂O → Fe(OH)₂ + 2Ni(OH)₂. 1.2V. KOH electrolyte.,"Extremely long life (20–50 years), rugged, tolerates abuse, uses abundant materials","Very high self-discharge, poor low-temp performance, heavy, gasses hydrogen","Stationary storage, off-grid solar, historic rail/mining traction"
+Nickel–Zinc (NiZn),Zn + 2NiOOH + H₂O → ZnO + 2Ni(OH)₂. 1.6–1.7V. Higher voltage than NiMH.,"Higher voltage (AA compatible), no cadmium, better energy density than NiCd","Zinc electrode dendrite growth, shorter cycle life, shape change","Power tools, AA replacement, electric bikes"
+Nickel–Hydrogen (NiH₂),H₂ + 2NiOOH → 2Ni(OH)₂. 1.25V. Pressurized H₂ gas anode in sealed vessel.,"Extremely long cycle life (>40,000 cycles), wide temperature range, used in space","Very bulky (pressure vessel), extremely expensive, not practical for ground use","Satellites (Hubble, ISS), aerospace power systems"
+Rechargeable Alkaline (RAM),"Same Zn-MnO₂ chemistry as alkaline primary, modified for limited recharging. 1.5V.","Low cost, uses existing alkaline infrastructure, no toxic metals","Very limited cycle life (10–50 cycles), capacity fade, not widely adopted","Consumer use, some medical devices, education"
+Nickel–Oxygen Battery,Ni(OH)₂ + O₂ from air → NiOOH (charge). Discharge reverses. 0.9V.,"Uses ambient O₂, lightweight (no O₂ storage), abundant Ni","Low cell voltage, slow oxygen kinetics, early stage","Research, stationary storage concept"
+4. Silver-Based Batteries,,,,
+Silver–Zinc Battery,Zn + Ag₂O → ZnO + 2Ag (or AgO in 2-step). 1.5–1.86V. KOH electrolyte.,"Highest energy density of aqueous systems, flat discharge, lightweight","Very high cost (silver), limited cycle life, zinc dendrite issues","Aerospace, submarines, military torpedoes, satellites"
+Silver–Cadmium Battery,Cd + 2AgO → CdO + 2Ag. 1.1–1.4V. KOH electrolyte.,"Better cycle life than Ag-Zn, reliable performance, aerospace heritage","Cadmium toxicity, silver cost, obsolescent","Aerospace, military (legacy), specialty applications"
+Silver–Calcium Battery,Ca alloy negative grid in Pb-acid-type. Not true Ag-Ca chemistry — typically refers to Ag-Ca grid alloy in lead batteries.,"Reduced water loss, lower self-discharge in Pb-acid context","Limited true electrochemistry benefits, mostly grid alloy optimization",Maintenance-free automotive batteries (grid alloy)
+Silver–Oxide Battery (Secondary),"Ag + Zn secondary rechargeable system. AgO/Ag₂O cathode, Zn anode. 1.5–1.8V.","Excellent energy density for aqueous system, flat voltage","High cost, limited cycle life, zinc electrode degradation","Military, aerospace, specialty high-energy applications"
+5. Lithium-Based Secondary Batteries,,,,
+5.1 Lithium-Ion Cathode Chemistries,,,,
+Li-ion Battery (General),Li⁺ shuttles between graphite anode and oxide cathode through liquid organic electrolyte. ~3.6V nominal.,"High energy density, long cycle life, low self-discharge, no memory effect","Flammable electrolyte, cost (cobalt), capacity fade, safety concerns","Consumer electronics, EVs, grid storage, aerospace"
+LCO (LiCoO₂),Li₁₋ₓCoO₂ + LiₓC₆ ↔ LiCoO₂ + C₆. 3.6V. Layered oxide cathode.,"High energy density, excellent cycle life, mature technology","Cobalt cost and supply risk, thermal instability at high charge, toxic Co","Smartphones, laptops, consumer electronics"
+LMO (LiMn₂O₄),LiMn₂O₄ spinel cathode. 4.0V. Three-dimensional Li-ion diffusion pathways.,"No cobalt, lower cost, good power density, safer than LCO","Mn dissolution at elevated temp, capacity fade, lower energy density","Power tools, medical devices, some EV applications"
+LFP (LiFePO₄),LiFePO₄ + 6C ↔ FePO₄ + LiC₆. 3.2V. Olivine structure. Very stable.,"Excellent safety, thermal stability, long cycle life (>3000 cycles), low cost","Lower energy density than NMC/NCA, lower voltage, heavier","EVs (Tesla LFP, BYD Blade), stationary storage, e-bikes, buses"
+LMFP (LiMnₓFe₁₋ₓPO₄),Mixed Mn-Fe olivine phosphate. ~3.5–3.8V. Combines LFP safety with higher voltage of LMP.,"Higher energy density than LFP, better voltage, improved safety vs. NMC","Less commercial maturity than LFP, Mn dissolution risk","Next-gen EVs, stationary storage (emerging)"
+NMC (LiNiₓMnᵧCoᵤO₂),"Layered oxide with Ni-Mn-Co in various ratios (111, 532, 622, 811). 3.6–3.7V.","High energy density, good balance of cost/safety/performance, dominant EV chemistry","Cobalt content (reducing in 8xx), thermal runaway risk at high SOC","EVs (most major OEMs), laptops, power tools, grid storage"
+NCA (LiNi₀.₈Co₀.₁₅Al₀.₀₅O₂),Layered oxide with Al doping for stability. 3.65V. Used by Tesla/Panasonic.,"Very high energy density, long cycle life, good power","Less thermally stable than NMC, requires precise charging management","Tesla EVs, power tools, aerospace"
+LTO (Li₄Ti₅O₁₂),Li₄Ti₅O₁₂ anode (zero strain) + various cathodes. 2.4V (vs. LFP). 1.5V nominal.,"Extremely long cycle life (>10,000), ultra-fast charge (10C), wide temp range, very safe","Low energy density (~60–80 Wh/kg), higher cost, lower voltage","Grid frequency regulation, buses, fast-charge stations, industrial"
+LNMO (LiNi₀.₅Mn₁.₅O₄),"High-voltage spinel cathode. 4.7V vs. Li/Li⁺. No Co, no Ni at full capacity.","High voltage → high energy, no cobalt, fast Li-ion diffusion (spinel structure)","Requires stable electrolyte at >4.5V (challenge), Mn dissolution, limited commercial use","Research EVs, high-voltage systems (emerging)"
+Li-Rich NMC (LRMO),xLi₂MnO₃·(1-x)LiMO₂ composite. >250 mAh/g capacity. 3.5V average.,"Very high capacity (30–50% above NMC), potential for next-gen energy density","Voltage fade on cycling, low initial coulombic efficiency, slow kinetics","Research stage; future EVs, aerospace (under development)"
+5.2 Lithium Metal & Polymer,,,,
+Lithium Metal Battery (Secondary),Li metal anode replaces graphite. Much higher energy density due to Li's high capacity (3860 mAh/g).,"Up to 2× energy density of Li-ion, high specific energy, lightweight","Lithium dendrite formation → short circuit/fire, low coulombic efficiency, challenging electrolyte","Research EVs, aerospace, next-gen portable (under development)"
+Lithium Polymer (LiPo),Li-ion with gel polymer electrolyte (PEO/PVDF). Flexible pouch format. 3.7V.,"Flexible form factor, thin profile, lightweight, no liquid leakage risk","Less energy dense than liquid Li-ion, requires protection circuit, swelling risk","Drones, smartphones, RC vehicles, wearables"
+Lithium–Silicon Battery,Si anode (theoretical 3579 mAh/g vs. 372 mAh/g graphite) + standard Li-ion cathode. ~3.6V.,Potentially 40% higher energy density than graphite Li-ion,"Si volume expansion (~300%), cracking, SEI instability, capacity fade","Next-gen EVs (Sila Nano, Amprius), wearables (emerging)"
+Silicon Anode Li-ion,Blended Si/graphite anode (5–20% Si). Incremental improvement over pure graphite.,"10–20% energy density increase vs. graphite, compatible with existing manufacturing","Still some expansion issues, careful formulation needed","Premium smartphones (Apple, Samsung), EVs (Panasonic 4680)"
+Lithium–Tin Battery,Sn anode (theoretical 994 mAh/g). Li₄.₄Sn alloy formation. Higher density than graphite.,"Higher capacity than graphite, potentially better volumetric density than Si","~260% volume expansion, cracking, limited cycle life","Research stage, nanostructured Sn anodes"
+Thin-Film Li-ion Battery,"Sputtered ceramic electrolyte (LiPON) on substrate. μm-thick. All-solid, flexible.","Extremely thin, flexible, long cycle life, solid electrolyte, safe","Very low capacity (μAh range), expensive deposition process","RFID, cardiac monitors, micro-sensors, smart cards"
+Anode-Free Lithium Battery,No pre-deposited Li anode; Li plates on bare Cu during charge. Cathode is Li source.,"Highest possible energy density, lower manufacturing cost (no Li anode)","Worst dendrite/CE challenges, short cycle life without solution","Research stage; target: EVs, drones"
+5.3 Lithium Conversion & Beyond-Intercalation,,,,
+Lithium–Sulfur (Li-S),2Li + S ↔ Li₂S. 2.1V average. Very high theoretical energy (2600 Wh/kg).,"~5× energy density of Li-ion theoretically, abundant/cheap sulfur, lightweight","Polysulfide shuttle, volume expansion, poor cycle life, self-discharge","Aerospace (Airbus research), drones, long-range EVs (development)"
+Lithium–Oxygen (Li-O₂),"4Li + O₂ ↔ 2Li₂O (or 2Li₂O₂). 2.96V. Theoretical 11,400 Wh/kg (Li only).","Extraordinarily high theoretical energy density, O₂ from ambient air","Parasitic reactions, Li₂O₂ clogging, poor round-trip efficiency, still laboratory stage","Ultra-long-range aviation, deep-space (long-term research goal)"
+Lithium–Air Battery,Li + O₂ (from air) → Li₂O₂/Li₂O. Variant using ambient air including CO₂/H₂O.,"Ultimate energy density potential, uses air as cathode reactant","CO₂/H₂O contaminants reduce performance, kinetics, dendrites — significant challenges",Research stage only; future EVs and aviation (theoretical)
+Lithium–Selenium Battery,2Li + Se ↔ Li₂Se. ~2.0V. Se cathode has higher electronic conductivity than S.,"Higher volumetric capacity than Li-S, better conductivity of Se, faster kinetics","Selenium expensive and rarer than S, lower gravimetric energy than Li-S",Research stage; niche high-performance applications
+Lithium–Fluoride Battery,Li + F → LiF. Highest theoretical cell voltage (~6.05V) and energy density. Conversion type.,Highest theoretical energy density among all battery chemistries,"Extreme challenge: LiF insulating, F₂ handling hazardous, still experimental",Deep research stage; future extreme-energy applications
+Lithium–Nitrogen Battery,6Li + N₂ ↔ 2Li₃N. ~0.44V. Ambient N₂ fixation electrochemically.,"N₂ from air (inexhaustible cathode), nitrogen fixation function","Very low voltage, poor kinetics, early-stage research",Research (dual function: battery + N₂ fixation for fertilizer)
+Lithium–CO₂ Battery,4Li + 3CO₂ ↔ 2Li₂CO₃ + C. ~2.8V. CO₂ from atmosphere/industrial sources.,"CO₂ sequestration + energy storage in one device, high energy density","CO₂ reduction kinetics poor, Li₂CO₃ passivation, reversibility challenge","Mars exploration (CO₂-rich atmosphere), carbon capture research"
+Lithium–Seawater Battery,Li anode | LISICON separator | seawater cathode. O₂ reduction in seawater. ~3.4V.,"Seawater as inexhaustible cathode, high energy density, useful underwater","LISICON membrane stability in seawater, limited power density","Underwater vehicles (AUV), marine power, subsea sensors"
+5.4 Lithium Hybrid-Ion,,,,
+Dual-Ion Lithium Battery,Both anion (PF₆⁻ into graphite cathode) and cation (Li⁺ into graphite anode) intercalation. ~4.5V.,"High voltage, simple chemistry, no transition metals, low cost","Low energy density, electrolyte consumption, capacity limited by salt concentration","Research stage, stationary storage potential"
+Lithium-Ion Capacitor (LIC),Li-intercalation anode (pre-doped graphite) + capacitive activated carbon cathode. 3.8V.,"High power density (supercapacitor-like) + moderate energy density, long cycle life","Complex pre-doping process, lower energy than full Li-ion, cost","Regenerative braking, UPS, grid frequency regulation, elevators"
+Lithium–Magnesium Hybrid-Ion,Mixed Li⁺/Mg²⁺ carrier systems in hybrid electrode architectures.,Potential to leverage Mg abundance and Li performance synergistically,"Electrolyte compatibility issues, early research stage",Research stage; future stationary storage
+Lithium–Zinc Hybrid-Ion,Zn anode with Li-containing electrolyte or mixed carrier. Aqueous or non-aqueous.,"Safer aqueous option, lower cost than full Li-ion","Limited energy density, complex electrolyte optimization","Research stage, aqueous energy storage"
+6. All-Solid-State Batteries,,,,
+Solid-State Battery (General),"Replace liquid electrolyte with solid ionic conductor (oxide, sulfide, polymer, halide). Li⁺ transport in solid.","No flammable liquid, enables Li metal anode, potentially higher energy density, wider temp range","Lower ionic conductivity than liquid (improving), interfacial resistance, manufacturing scale-up","EVs (Toyota, Solid Power), medical implants, aerospace (near-term commercialization)"
+"SSB – Oxide (LLZO, LATP)",Li₇La₃Zr₂O₁₂ (LLZO) or Li₁.₃Al₀.₃Ti₁.₇(PO₄)₃ (LATP). Ceramic pellet electrolyte.,"High electrochemical stability, wide voltage window, chemically stable","Brittle, poor interfacial contact, requires high-pressure sintering, difficult to scale","Medical implants, aerospace, small-format (research + emerging commercial)"
+SSB – Sulfide (Li₆PS₅Cl),Li₆PS₅Cl (argyrodite) or Li₁₀GeP₂S₁₂ (LGPS). High ionic conductivity (~10⁻² S/cm).,"Highest ionic conductivity of solid electrolytes, room-temperature operation, processable","Air/moisture sensitivity, narrow electrochemical window, H₂S release if exposed to water","EVs (Samsung SDI, Toyota 2027 target), portable electronics"
+SSB – Polymer (PEO),Poly(ethylene oxide) + Li salt. Li⁺ transport via polymer chain segmental motion. ~60–80°C operation.,"Flexible, lightweight, easy manufacturing, thin-film compatible","Requires elevated temperature for adequate conductivity, narrow voltage window","Bolloré Bluecar EV (deployed), medical implants, thin-film cells"
+SSB – Halide,"Li₃InCl₆, Li₃YCl₆ etc. Halide solid electrolytes. 4V stability window.","High oxidation stability (4V+), compatible with oxide cathodes, processable in air","Narrower window vs. sulfide for anodes, still developing",Research and early commercial; EV solid-state cells
+All-Solid-State Organic Battery,"Organic radical or polymer electrodes + solid polymer electrolyte. All-organic, flexible.","Fully flexible, biocompatible, potentially biodegradable, lightweight","Low energy density, poor conductivity, limited cycle life","Wearables, bioelectronics research"
+Glass Battery (Solid Electrolyte),"John Goodenough's glassy solid electrolyte concept (e.g., Li₂O·B₂O₃·SiO₂ glass). ~3V.","Claimed ultra-high capacity and cycle life (contested), wide temp range, safe","Scientific controversy over claims, not yet independently verified at scale","Research stage; if validated: EVs, grid storage"
+Thin-Film Solid-State Battery,LiPON (Li₂.₉PO₃.₃N₀.₄₆) electrolyte sputtered on substrate. μm-scale cells.,"Extremely long cycle life (>10,000), safe, no liquid, precise fabrication","Very low capacity (μAh), expensive vacuum deposition, limited to small devices","RFID, smart cards, medical microsensors, IoT devices"
+Perovskite Solid-State Battery,"Perovskite-structured Li-ion conductor (e.g., LLTO: Li₃ₓLa₂/₃₋ₓTiO₃) as electrolyte.","High bulk conductivity, crystalline stability, well-studied structure","High grain boundary resistance limits practical conductivity, Ti reduction at low V",Research stage; potential EV/grid application if boundary resistance solved
+7. Sodium-Based Batteries,,,,
+Sodium-Ion Battery (Na-ion),Na⁺ intercalation between hard carbon anode and layered oxide/Prussian blue cathode. ~3.2V.,"Abundant/cheap Na, no Li/Co required, similar manufacturing to Li-ion, safe","Lower energy density than Li-ion, larger Na⁺ ion limits electrode choices","Grid storage, low-cost EVs (CATL Na-ion 2023), two-wheelers, off-grid"
+Aqueous Sodium-Ion Battery,"Na⁺ transport in water-based electrolyte. Inherently safe, non-flammable.","Non-flammable, low cost, environmentally friendly, safe manufacturing","Limited voltage window (~1.2V aqueous), lower energy density","Stationary grid storage, home energy systems"
+Sodium–Sulfur (High-Temp),2Na + S ↔ Na₂Sₓ. 300–350°C operation. Molten Na/S with β-alumina solid electrolyte. 2.1V.,"Very high energy density, high efficiency, no self-discharge, long life (NGK >4500 cycles)","Requires thermal management (300°C), sodium fire risk if seal fails, large format only","Grid-scale energy storage (NGK Insulators), wind/solar firming"
+Room-Temp Na–Sulfur Battery,Na-S at room temperature using solid or gel electrolyte. 1.8–2.1V.,"Avoids high-temperature operation, safer than molten Na-S, same abundant materials","Polysulfide shuttle (like Li-S), poor cyclability, still research stage",Research stage; future low-cost stationary storage
+Sodium–Metal Chloride (ZEBRA),Na + NiCl₂ ↔ NaCl + Ni. 2.58V. 270–350°C. β-alumina electrolyte.,"High energy density (for high-temp), safer than Na-S (solid reaction products), tolerates overcharge","High operating temperature, thermal management needed, large/heavy","EV buses (FIAMM), stationary storage, marine, grid backup"
+Sodium–Air Battery,Na + O₂ → NaO₂ or Na₂O₂. ~2.3–2.7V. Open cathode uses atmospheric O₂.,"Very high theoretical energy density, O₂ from air","Na reactivity with air moisture, poor reversibility, early-stage research",Research stage; long-range applications (theoretical)
+Prussian Blue Analog (PBA) Na-ion,Na₂MnFe(CN)₆ or similar open-framework cathode. 3.0–3.4V. Large channels for Na⁺.,"Low cost, earth-abundant materials, easy synthesis, high cycle life, no Li","Lower energy density, Mn Jahn-Teller distortion, water content management","Grid storage, CATL Na-ion commercial cells, low-cost stationary"
+Anode-Free Sodium Battery,Na plates on bare Cu during charge; cathode supplies all Na. No Na metal pre-deposited.,"Maximum energy density for Na systems, lower manufacturing cost","Na dendrites, low coulombic efficiency, short cycle life (research)",Research stage; future grid storage if cyclability solved
+Sodium–Organic Battery,"Na⁺ storage in organic/carbonyl-based electrodes (e.g., Na₂C₆O₆, PTCDA derivatives).","Sustainable (organic), tunable redox potential, no rare metals","Low electronic conductivity, solubility in electrolyte, lower energy density",Research stage; sustainable grid storage concept
+8. Potassium-Based Batteries,,,,
+Potassium-Ion Battery (K-ion),"K⁺ intercalation in graphite anode (KC₈, higher capacity than Na in graphite) and Prussian blue/organic cathode. ~3.7V.","Abundant K, graphite anode works well (unlike Na), low-cost materials, high voltage","K metal reactivity, limited cathode options, early commercialization stage",Research stage; future low-cost stationary storage
+Aqueous K-Ion Battery,"K⁺ transport in aqueous electrolyte. Safer, non-flammable.","Inherently safe, low cost, environmentally benign","Low voltage (aqueous window), limited energy density","Grid storage research, safe stationary applications"
+Potassium–Oxygen (K-O₂),K + O₂ → KO₂. 2.48V. Superoxide product is more stable than Li₂O₂.,"More reversible than Li-O₂ (KO₂ forms directly), high theoretical energy","K metal reactivity, O₂ electrode kinetics, moisture sensitivity",Research stage; high-energy secondary battery concept
+Potassium–Air Battery,K + ½O₂ (from air) → ½K₂O₂. Uses atmospheric O₂.,"Abundant K, high theoretical energy density, air cathode","K reactivity with moisture/CO₂ in air, limited reversibility",Research stage only
+Potassium–Sulfur Battery,2K + S → K₂S. ~1.8V. Analogous to Li-S with K.,"Abundant materials, potentially high energy density, no Li needed","Polysulfide shuttle, K metal dendrites, poor cycle life, early stage",Research stage; future low-cost storage
+PBA Potassium-Ion Battery,KₓMnFe(CN)₆ open-framework cathode. Large channels accommodate K⁺. ~3.6V.,"Earth-abundant, simple synthesis, good cycle life, high-rate capability","Lower energy density, Mn dissolution, water management",Research stage; stationary grid storage potential
+9. Zinc-Based Batteries,,,,
+Zinc-Ion Battery (Zn-ion),Zn²⁺ intercalation in MnO₂ or V₂O₅ cathode. Zn metal anode. Mild aqueous ZnSO₄ electrolyte. ~1.2–1.4V.,"Safe aqueous electrolyte, Zn abundant and cheap, recyclable, non-toxic","Zn dendrite growth, cathode dissolution, limited energy density, limited cycle life","Grid storage, consumer electronics, stationary backup (commercializing)"
+Aqueous Zinc-Ion Battery,"Zn anode in mild aqueous electrolyte (ZnSO₄, Zn(CF₃SO₃)₂). Cathode: MnO₂, V₂O₅, Prussian blue.","Intrinsically safe, non-flammable, low cost, low toxicity, room-temperature operation","Dendrite formation, cathode stability, limited cycle life vs. Li-ion","Grid storage, off-grid solar, safe indoor energy storage"
+Zinc–Air Battery (Secondary),Zn + O₂ → ZnO (discharge); ZnO + 2e⁻ → Zn + O²⁻ (charge). ~1.65V. KOH electrolyte.,"Very high energy density, O₂ from air (lightweight), Zn abundant","Slow ORR/OER kinetics, CO₂ degradation of KOH, Zn dendrites on charge","Grid storage (Eos Energy, Form Energy research), EV range extenders"
+Zinc–Bromine Battery (Zn-Br₂),Zn + Br₂ ↔ ZnBr₂. ~1.8V. Flow or static. Aqueous ZnBr₂ electrolyte.,"High energy density for aqueous flow, low cost, good efficiency","Bromine toxicity and vapor pressure, corrosion, complex sealing","Grid storage (Redflow ZBM), remote area power, solar firming"
+Zinc–Iodine Battery (Zn-I₂),"Zn + I₂ ↔ ZnI₂. ~1.3V. Aqueous, iodine confined to cathode.","Non-toxic, abundant iodine, good safety, solid-state iodine confinement possible","Lower energy density than Zn-Br, iodine solubility management","Research stage; safe stationary storage, grid applications"
+Zinc–Manganese Dioxide (Zn-MnO₂ Rechargeable),Zn + 2MnO₂ ↔ ZnO·MnO₂ + MnOOH. ~1.3–1.5V aqueous. Rechargeable variant.,"Low cost, safe, abundant materials, no heavy metals","Limited cycle life (phase changes in MnO₂), capacity fade, dendrites","Grid storage research, consumer rechargeable, emerging commercial"
+Zinc–Nickel Battery,Zn + 2NiOOH → ZnO + 2Ni(OH)₂. 1.73V. Alkaline KOH electrolyte.,"Higher voltage than NiMH/NiCd, abundant Zn, no cobalt/cadmium",Zn electrode shape change and dendrites limit cycle life,"EV buses (ViZn Energy, defunct), stationary storage, grid (limited)"
+Copper–Zinc Rechargeable Battery,Cu²⁺/Cu + Zn ↔ Cu + Zn²⁺. ~1.1V. Analogous to Daniell cell but rechargeable.,"Earth-abundant materials, non-toxic, low cost","Low energy density, copper dissolution management, cycle life",Research stage; low-cost stationary concept
+Zinc–Iron Battery,Zn + Fe(OH)₂ ↔ Zn(OH)₂ + Fe. Alkaline electrolyte. ~1.0V.,"Very abundant and cheap materials, safe, non-toxic","Low energy density, need for electrolyte management",Research stage; ultra-low-cost grid storage
+Zinc–Chlorine Battery,Zn + Cl₂ ↔ ZnCl₂. ~2.1V. Flow battery concept with Cl₂ storage.,"Very high theoretical energy density for aqueous system, high voltage","Cl₂ is toxic and corrosive, complex system, limited to research",Research/historical concept
+10. Magnesium-Based Batteries,,,,
+Magnesium-Ion Battery (Mg-ion),"Mg²⁺ intercalation/deposition. Mg anode (3837 mAh/cm³ volumetric, higher than Li), various cathodes. ~2.0V.","Mg abundant, divalent (2e⁻ per ion = high capacity), safe metal anode (no dendrites reported), low cost","Mg²⁺ slow solid-state diffusion, incompatible with most electrolytes, limited cathode choices","Research stage; future EVs, stationary storage (promising but pre-commercial)"
+Magnesium–Sulfur Battery (Mg-S),Mg + S → MgS. ~1.8V. High theoretical energy density (1722 Wh/kg).,"High energy density, cheap S and Mg, no dendrites on Mg anode","MgS insulating, slow kinetics, polysulfide issues, electrolyte incompatibility",Research stage; future high-energy storage
+Magnesium–Air Battery,Mg + ½O₂ + H₂O → Mg(OH)₂. ~3.1V. Uses atmospheric O₂.,"Very high energy density, Mg abundant, activated in air","Non-rechargeable (primary type), self-corrosion, limited power density","Military emergency power, marine applications"
+Aqueous Magnesium-Ion Battery,"Mg²⁺ in aqueous electrolyte (MgSO₄). Safer, non-flammable.","Intrinsically safe, non-flammable, low cost","Very limited voltage window, slow Mg²⁺ diffusion, low energy density",Research concept; safe stationary storage
+Seawater-Activated Mg Battery,"Mg anode activated by seawater as electrolyte. Various cathodes (AgCl, CuCl, O₂).","Indefinite shelf life, instant activation in seawater, lightweight","Single-use, performance dependent on seawater salinity/temp","Maritime emergency power, underwater vehicle propulsion, sonobuoys"
+11. Calcium-Based Batteries,,,,
+Calcium-Ion Battery (Ca-ion),Ca²⁺ intercalation. Ca anode (theoretical 1337 mAh/g). Various oxide/sulfide cathodes. ~3–4V.,"Ca abundant, cheap, divalent, potentially high energy density, safe","Ca²⁺ very slow diffusion in solids, difficult electrolyte (Ca deposition often impossible below 2.5V)",Research stage; promising if electrolyte challenges overcome
+Aqueous Calcium-Ion Battery,Ca²⁺ in aqueous electrolyte. Inherently safe.,"Non-flammable, low cost, environmentally benign","Very limited voltage window, poor Ca²⁺ kinetics, very early stage",Research concept only
+Calcium–Sulfur Battery,Ca + S → CaS. ~2.0V theoretical. High energy density (1228 Wh/kg).,"Earth-abundant materials, high theoretical energy density, no Li","CaS insulating, Ca electrolyte challenges, very early research",Research stage
+Calcium–Air Battery,Ca + O₂ → CaO. ~3.4V. High theoretical energy density.,"High voltage + high energy density potential, abundant Ca","Ca reactivity with air moisture, poor reversibility, early stage",Research stage; theoretical high-energy applications
+12. Aluminum-Based Batteries,,,,
+Aluminum-Ion Battery (Al-ion),"Al ↔ Al³⁺ + 3e⁻. AlCl₄⁻ intercalates into graphite cathode in ionic liquid (AlCl₃/[EMIm]Cl). ~2.0V.","Al abundant/cheap (3rd most abundant element), trivalent (3e⁻/ion), fast charge capability, safe","Ionic liquid electrolyte cost, low energy density, cathode limited options, HCl corrosion risk","Research stage; MIT/Stanford demos, fast-charge niche applications"
+Aluminum–Air Battery,Al + 3/4O₂ + 3/2H₂O → Al(OH)₃. ~1.2–2.7V. Very high theoretical energy density.,"Extremely high theoretical energy density (~8 Wh/g), abundant Al, lightweight","Non-rechargeable (primary primary), Al passivation in alkaline, parasitic corrosion","Range extender concept for EVs, emergency backup, research"
+Aluminum–Graphite Dual-Ion Battery,Al anode + graphite cathode; both AlCl₄⁻ (cathode) and Al plating (anode) in ionic liquid.,"High voltage (~2V), fast charge (1 minute reported by researchers), low cost of Al/graphite","Ionic liquid cost/toxicity, low energy density, Al corrosion management","Fast-charge grid regulation, research stage"
+Aluminum–Sulfur Battery,Al + S → Al₂S₃. ~1.25V. Molten salt electrolyte (low-temp). MIT 2022 demonstration.,"Very cheap (Al + S), no rare metals, high theoretical capacity, melt at 100°C possible","Moderate energy density, elevated temp operation, early stage",Low-cost stationary grid storage (research to early commercial)
+13. Iron-Based Batteries,,,,
+Iron–Air Battery,Fe + O₂ + H₂O → Fe(OH)₂/Fe₂O₃. ~1.28V. KOH electrolyte. Very abundant Fe.,"Extremely cheap (Fe and air), high theoretical energy density (~764 Wh/kg), non-toxic","Low round-trip efficiency (~50%), slow kinetics, Fe electrode passivation, parasitic H₂ evolution",Long-duration grid storage (Form Energy 100-hour battery commercial 2024)
+All-Iron Redox Flow Battery,Fe³⁺/Fe²⁺ (catholyte) + Fe²⁺/Fe⁰ (anolyte). Aqueous FeCl₂ electrolyte. ~1.2V.,"Very low cost (FeCl₂), non-toxic, safe, long duration capable, abundant material","Moderate energy density, Fe plating dendrites on anolyte side, acidic electrolyte","Grid storage (ESS Inc. commercial), long-duration storage, microgrids"
+Iron–Chromium Flow Battery,Fe³⁺/Fe²⁺ (positive) + Cr³⁺/Cr²⁺ (negative). ~1.0V. HCl electrolyte.,"Low-cost materials, non-flammable, suitable for long-duration storage","Cross-contamination of Fe/Cr, Cr kinetics slow, lower voltage than V-RFB","Grid storage research, NASA historical development, EnerVault"
+Iron–Sulfur Battery (Secondary),Fe–S conversion chemistry. FeS₂ or FeS cathode. Organic or molten salt electrolyte.,"Earth-abundant Fe and S, high theoretical capacity of FeS₂ (894 mAh/g)","Low conductivity, structural degradation, limited cycle life",Research stage; niche low-cost storage
+Super Iron Battery,"Fe(VI) (FeO₄²⁻, ferrate) as high-oxidation-state cathode + Zn or other anode. ~1.5–1.9V.","Non-toxic, environmentally benign Fe(VI), high cathode capacity","Fe(VI) synthesis/stability challenges, non-rechargeable in most forms",Research stage; green battery concept
+14. Liquid Metal & High-Temperature Batteries,,,,
+Liquid Metal Battery (General),"Liquid metal anode (e.g., Li, Mg) | molten salt electrolyte | liquid metal alloy cathode (e.g., Sb, Bi). Self-stratifying by density.","Extremely long cycle life (no solid-state degradation), low-cost materials, scalable","High operating temperature (400–700°C), thermal management, specialized sealing","Grid-scale storage (Ambri Inc.), industrial long-duration storage"
+Li–Bismuth Liquid Metal Battery,"Li (top, anode) | LiCl-LiF molten salt | Li-Bi alloy (bottom, cathode). ~0.7V. ~500°C.","Long cycle life, low cost, simple self-assembling structure","High temp, low voltage (must stack many cells), thermal management","Grid storage (Ambri), industrial backup"
+Li–Antimony Liquid Metal Battery,Li | molten salt | Sb alloy cathode. ~0.9V. ~700°C.,"Higher voltage than Li-Bi, long life, scalable architecture","Even higher operating temperature, requires insulated enclosure",Grid storage research (MIT Sadoway group)
+Magnesium–Antimony Liquid Metal Battery,Mg | MgCl₂-KCl-NaCl molten salt | Mg-Sb alloy. ~0.4V. ~700°C.,"Earth-abundant Mg and Sb, long cycle life, scalable","Low voltage (series stacking needed), high temp, Mg reactivity",Grid storage research (Sadoway/MIT)
+Calcium–Antimony Liquid Metal Battery,Ca | CaCl₂ molten salt | Ca-Sb alloy. ~0.8V. ~700°C.,"Higher voltage potential, abundant Ca, long life concept","Very high operating temperature, Ca handling, early-stage development",Research; future grid storage
+Molten Salt Battery (General),"Various metals in molten salt electrolytes at elevated temperature. ZEBRA, Na-S, liquid metal fall here.","High energy density possible at temp, no solid electrolyte limitations","Thermal management required, not suitable for portable use","Grid storage, industrial UPS, stationary EV charging buffers"
+15. Redox Flow Batteries,,,,
+Vanadium Redox Flow Battery (VRFB),V²⁺/V³⁺ (negative) + V⁴⁺/V⁵⁺ (VO²⁺/VO₂⁺) (positive) in H₂SO₄. ~1.4V. All-vanadium prevents cross-contamination.,"Long cycle life (>20,000), independent energy/power scaling, no cross-contamination, fully reversible","Vanadium cost and supply, large footprint, low energy density (~25 Wh/L)","Grid storage (Rongke Power 200 MWh China, Bushveld, Invinity), microgrids, island storage"
+Iron–Chromium Flow Battery,Fe³⁺/Fe²⁺ | Cr³⁺/Cr²⁺ in HCl. ~1.0V. Low-cost materials.,"Very low material cost, non-toxic, long duration capable","Cross-contamination over time, Cr kinetics slow, lower voltage","Grid storage (EnerVault, Sumitomo), long-duration energy storage"
+Zinc–Bromine Flow Battery (ZBFB),Zn | Br₂/Br⁻ in ZnBr₂ solution. ~1.85V. Br₂ complexed with quaternary ammonium.,"Higher energy density than VRFB, low-cost electrolyte, good cycle life","Bromine toxicity/corrosiveness, Zn dendrite management, complex sealing","Distributed grid storage (Redflow, Primus Power), microgrids, island power"
+Organic Redox Flow Battery (Quinone),"Anthraquinone-2,7-disulfonate (AQDS)/HBr or ferrocyanide/DHAQ pairs. ~0.8–1.0V.","Low-cost organic molecules, no rare metals, water-based, safer than Br-based","Lower energy density, molecule degradation, stability over long duration","Research stage; Harvard/MIT groups, future low-cost grid storage"
+All-Iron Flow Battery,Fe³⁺/Fe²⁺ (positive) + Fe²⁺/Fe⁰ (negative). Aqueous FeCl₂. ~1.2V.,"Very cheap (FeCl₂), non-toxic, single-element (no cross-contamination), abundant","Fe plating side concerns, acidic electrolyte, lower energy density than VRFB","Commercial grid (ESS Inc. Energy Warehouse), microgrids"
+Hydrogen–Bromine Flow Battery,H₂/H⁺ (negative) + Br₂/Br⁻ (positive). ~1.09V. Uses H₂ fuel electrode.,"Very fast kinetics (H₂ oxidation), high efficiency, H₂ can be from renewable electrolysis","Bromine corrosiveness, H₂ infrastructure, two-phase management",Grid storage research (MIT); potential coupling with H₂ economy
+Polysulfide–Bromine Flow Battery,NaBr/Br₂ (positive) + Na₂Sₓ (negative). ~1.36V. Aqueous NaBr/Na₂S.,"Earth-abundant Na, S, Br; low material cost; reasonable energy density","Cross-contamination produces toxic HBr+S, difficult membrane selection","Research and limited demos (Regenesys UK, discontinued)"
+Semi-Solid/Slurry Flow Battery,"Li-ion active particles suspended in electrolyte, pumped through flow reactor (MIT SSLFB).","High energy density (of Li-ion) + flow battery scalability, no membrane needed","Complex slurry rheology, particle settling, early-stage development",Research stage; future grid storage combining Li-ion energy density + flow scalability
+Manganese Redox Flow Battery,Mn²⁺/Mn³⁺ or Mn²⁺/MnO₂ as catholyte. Various anolytes.,"Mn abundant and cheap, moderate voltage","Mn³⁺ disproportionation, limited cycle life, MnO₂ deposition issues",Research stage; low-cost grid storage
+Vanadium–Bromine Flow Battery,VO²⁺/VO₂⁺ (positive) + V²⁺/V³⁺ or Br⁻/Br₂ (negative). Higher energy density than VRFB.,"Higher energy density than standard VRFB, same V electrolyte reusability",Bromine addition reintroduces toxicity/corrosion issues,Research stage; modified VRFB concept
+16. Metal–Air Batteries,,,,
+Lithium–Air Battery,4Li + O₂ ↔ 2Li₂O (theoretical). 2.96V. Atmospheric O₂ cathode.,"Theoretical energy density ~11,400 Wh/kg (highest of any rechargeable), O₂ from air","Li₂O₂ clogging, poor round-trip efficiency, moisture sensitivity, far from practical","Ultra-long-range aviation research, deep-space power (future)"
+Zinc–Air Battery (Metal-Air context),Zn + ½O₂ → ZnO. 1.65V. KOH electrolyte. Can be primary or secondary.,"High energy density (1086 Wh/kg theoretical), Zn abundant, non-toxic","ORR/OER kinetics limiting rechargeability, CO₂ sensitivity, dendrites","Hearing aids (primary), grid storage R&D (Eos Energy), range extenders"
+Iron–Air Battery,Fe + O₂ + H₂O → Fe(OH)₂. ~1.28V. Alkaline. Very cheap.,"Ultra-low-cost materials (Fe + air), long duration storage potential, non-toxic","Low efficiency (~45%), slow kinetics, Fe passivation, best for long-duration use",Grid long-duration storage (Form Energy Iron-Air commercial 2024)
+Aluminum–Air Battery (Metal-Air),Al + O₂ + H₂O → Al(OH)₃. 1.6–2.7V. Very high theoretical energy.,"Highest energy density of practical metal-air concepts, lightweight, abundant Al","Non-rechargeable in practice, Al passivation, self-corrosion in alkaline","EV range extender concepts, emergency backup, military"
+Magnesium–Air Battery (Metal-Air),Mg + ½O₂ + H₂O → Mg(OH)₂. ~3.1V open circuit. Saline or alkaline.,"High energy density, Mg abundant, activated rapidly","Self-corrosion (parasitic Mg reaction), non-rechargeable, limited power rate","Military emergency power, marine sensors, medical reserve"
+Sodium–Air Battery (Metal-Air),Na + O₂ → NaO₂ (2.27V) or Na₂O₂ (2.33V). Competing discharge products.,"Na abundant and cheap, potentially high energy density","Na reactivity, moisture sensitivity, product phase control challenge, early stage",Research stage; future high-energy secondary battery
+Silicon–Air Battery,Si + O₂ → SiO₂. ~1.75V. Ionic liquid electrolyte (Si oxide insulating requires special conditions).,"Si most abundant solid element, very high theoretical energy density","SiO₂ passivation blocks discharge, very challenging electrochemistry, early stage",Research curiosity; potential ultra-high-energy niche application
+Carbon–Air Battery,C + O₂ → CO₂. ~1.02V. Analogous to fuel cell (carbon fuel cell concept).,"Carbon fuels abundant, potentially very high energy density","CO₂ product is greenhouse gas, irreversible, more fuel cell than battery",Research/concept; stationary power using waste carbon
+Cadmium–Air Battery,Cd + O₂ → CdO. ~1.2V.,"Higher energy than NiCd theoretically, flat discharge","Cadmium toxicity, environmental hazard, very limited research interest",Historical research; not practically pursued
+17. Multivalent & Specialty Ion Batteries,,,,
+17.1 Multivalent Cation,,,,
+Ammonium-Ion Battery (NH₄⁺),NH₄⁺ as charge carrier in aqueous electrolyte. Intercalates into MnO₂ or Prussian blue cathode.,"Non-toxic, earth-abundant, NH₄⁺ similar size to K⁺ (fast diffusion), aqueous safety","Low energy density, limited cathode options, early research stage",Research; safe aqueous stationary storage concept
+Fluoride-Ion Battery (FIB),"F⁻ as anion carrier. Metal fluoride cathode (e.g., CuF₂, BiF₃). 3–5V potential. Solid or liquid electrolyte.","Potentially highest energy density of any solid carrier (high F⁻ charge density), multiple e⁻ per ion","F⁻ solid-state diffusion very slow, fluoride electrolyte challenging, early stage","Research stage (NASA JPL, KIT Germany); future ultra-high-energy batteries"
+Chloride-Ion Battery (CIB),Cl⁻ carrier. VCl₃/InCl₃ cathode materials. Solid or ionic liquid electrolyte.,"Cl abundant, multiple-electron transfer, tunable potential","Limited ionic conductivity for Cl⁻, early research, few practical electrolytes",Research stage
+Copper-Ion Battery,Cu²⁺ as carrier. Cu metal anode + CuS or similar cathode. ~1.1V.,"Cu abundant, 2e⁻ transfer, simple plating chemistry","Cu²⁺ slow diffusion in solids, electrolyte compatibility, dendrite issues",Research stage; low-cost portable concept
+Vanadium-Ion Battery,V²⁺/V³⁺ in solid-state storage (distinct from flow). Multiple oxidation states available.,Multiple redox states of V → high capacity potential,"Low electronic conductivity of V compounds, early research",Research stage; vanadium oxide electrode systems
+Bismuth-Ion Battery,Bi³⁺ carrier. Bi anodes with various cathodes. ~0.8V.,"Bi non-toxic (heavy metal but low toxicity), unique Bi alloy chemistry","Low voltage, limited cycle life, early stage",Research; niche specialty applications
+Zirconium-Ion Battery,Zr⁴⁺ carries 4 electrons per ion. Theoretical very high capacity.,4e⁻ transfer per ion = extremely high theoretical capacity,"Zr⁴⁺ diffusion extremely slow in solids, very early stage",Deep research only
+Rubidium-Ion Battery (Rb-ion),"Rb⁺ analogous to K-ion. Large ion, works in some Prussian blue frameworks.","Demonstrates large alkali ion storage concepts, informative for K/Cs research","Rb expensive and rare, not practical commercially",Research curiosity; fundamental studies
+Cesium-Ion Battery (Cs-ion),Cs⁺ largest stable alkali ion. Intercalation in expanded frameworks.,"Demonstrates limits of alkali ion storage, structural stability research","Cs expensive, radioactive isotopes concern, not practical",Research curiosity; fundamental electrochemistry
+17.2 Anion Carrier,,,,
+Solid-State Fluoride-Ion Battery,"F⁻ carrier in LaF₃-based solid electrolyte. BiF₃, CuF₂ cathode. 3–5V.","Very high energy density potential, solid state = safe, wide voltage window","Room-temp F⁻ conductivity very low, electrode/electrolyte interfacial challenges","Research stage (KIT Karlsruhe, Honda R&D); future EV/aerospace"
+Oxygen-Ion Battery,O²⁻ carrier in oxide ceramics. High-temp operation (500–800°C). Fuel cell/battery hybrid concept.,"O abundant, high energy density potential, direct use of oxide chemistry","Very high temperature required for O²⁻ mobility, specialized materials",Research concept; stationary high-temp energy storage
+Iodide-Ion Battery,I⁻/I₃⁻ anion carrier. Solid or liquid electrolyte. Related to Zn-I₂ chemistry.,"Iodine abundant, non-toxic, solid-state iodine confinement possible","Low voltage, limited cycle life, solubility issues",Research stage
+18. Proton & Hydrogen-Based Batteries,,,,
+Proton Exchange Membrane (PEM) Battery,H₂ + ½O₂ → H₂O at PEM. H⁺ carrier through Nafion membrane. ~1.23V (fuel cell mode).,"High efficiency, H₂O only byproduct, scalable, fast response","H₂ storage/infrastructure cost, Pt catalyst cost, membrane durability","Stationary backup power, EV fuel cells (Toyota Mirai), portable power"
+Proton Rocking-Chair Battery,"H⁺ shuttles between two intercalation electrodes (e.g., MoO₃ and WO₃). Aqueous. ~0.5–1.0V.","Safe aqueous H⁺ carrier, no lithium needed, simple electrolyte (dilute acid)","Low voltage, limited electrode options, capacity fade, early stage",Research stage; safe aqueous energy storage concept
+Nickel–Hydrogen Battery (NiH₂),"H₂ + 2NiOOH → 2Ni(OH)₂. 1.25V. Pressurized H₂ vessel, aqueous KOH.","Exceptional cycle life (>80,000 LEO cycles in space), wide temp range, reliable","Very bulky and expensive (pressure vessel, Pt catalyst), not suitable for ground transport","Communication satellites, Hubble Space Telescope, ISS, deep-space missions"
+Hydrogen–Bromine Battery,H₂/H⁺ anode + Br₂/Br⁻ cathode. Aqueous HBr. ~1.09V. Fast kinetics.,"Very fast charge/discharge, high efficiency, H₂ and Br₂ stored separately","Br₂ toxicity, H₂ infrastructure, corrosion management","Grid frequency regulation, renewable energy coupling (research)"
+Rechargeable Fuel Battery,Hybrid: stores fuel (H₂ or MeOH) electrochemically regenerated during charge. Fuel cell + electrolyzer.,"Decoupled energy (fuel tank) from power (cell), long duration possible","Complex system, efficiency losses in dual conversion, high cost","Long-duration stationary storage, military, remote power"
+"19. Organic, Polymer & Framework-Based Batteries",,,,
+All-Organic Battery,"Both electrodes are organic redox-active molecules (e.g., quinones, PTMA radicals). No metals.","Sustainable, tunable via synthesis, potentially biodegradable, lightweight","Low energy density, organic solubility in electrolyte, low conductivity","Research stage; sustainable flexible electronics, biomedical"
+Organic Radical Battery (PTMA/TEMPO),"Poly(2,2,6,6-tetramethylpiperidinyloxy methacrylate) radical electrode. ~3.5V vs. Li.","Ultra-fast charge/discharge (seconds), long cycle life (>1000), flexible processing","Low energy density (~70 Wh/kg), radical dissolution, limited capacity","Research stage; fast-response electronics, wearables, IoT"
+Quinone-Based Battery,Quinone/hydroquinone redox (C₆H₄O₂/C₆H₄(OH)₂). 2e⁻ per molecule. 0.5–3.5V depending on substituents.,"Abundant organic carbonyl chemistry, tunable potential, no rare metals","Solubility in electrolyte, low conductivity, voltage hysteresis","Research; aqueous flow batteries (AQDS), non-flow organic cells"
+Covalent Organic Framework (COF) Battery,Porous crystalline organic polymer (COF) with redox-active groups. Li⁺/Na⁺/K⁺ storage.,"Ultra-high surface area, regular pore structure, tunable chemistry, lightweight","Low electronic conductivity, complex synthesis, early research",Research stage; future Li/Na/K ion batteries with high rate capability
+Metal–Organic Framework (MOF) Battery,Porous metal-organic coordination network with redox-active metal nodes and/or linkers.,"High surface area, tunable pore size, can incorporate redox-active metals (Fe, Co, Ni)","Limited stability in liquid electrolyte, early research, conductivity challenge",Research stage; nanostructured electrodes for Li/Na batteries
+Prussian Blue Analog (PBA) Battery,"Transition metal hexacyanometallate framework (e.g., Fe₄[Fe(CN)₆]₃). Open channels for Na⁺/K⁺/Zn²⁺.","Simple synthesis, low cost, earth-abundant Fe/Mn, good rate capability","Water in structure causes capacity fade, Mn dissolution, moderate energy density","Na-ion commercial (CATL), Zn-ion research, K-ion research"
+Conductive Polymer Battery (PANI/PEDOT/PPy),"Polyaniline (PANI), PEDOT, or polypyrrole (PPy) as electrode. Anion doping/dedoping stores charge.","Flexible, lightweight, fast kinetics, environmentally benign","Low energy density, capacity fade over cycling, not competitive with Li-ion","Research stage; flexible/wearable electronics, energy harvesting supplement"
+20. Silicon & Tin-Based Batteries,,,,
+Silicon–Sulfur Battery,Si anode (high capacity) + S cathode (high capacity). Both conversion type. ~2.0V.,Both electrodes have very high theoretical capacity → extreme energy density potential,"Si volume expansion + S polysulfide shuttle combined = dual challenges, very early stage",Research stage; future ultra-high-energy batteries
+Silicon–Selenium Battery,Si anode + Se cathode. ~2.0V. Se has better conductivity than S.,"High capacity electrodes, better kinetics than Si-S, conductivity advantage of Se","Se expensive, Si expansion still problematic, early research",Research stage
+Tin–Sulfur Battery,Sn anode + S cathode. Aqueous or non-aqueous. ~1.5V.,"Relatively lower volume expansion than Si (~200% vs. ~300%), cheaper than Si","Sn expansion still significant, polysulfide issues with S cathode",Research stage
+Silicon Anode Li-ion Battery,Si (or Si/C composite) anode + standard NMC/NCA cathode. ~3.6V.,"10–40% energy density gain over graphite, commercially developing",Si volume change causes cracking/capacity fade without nanostructuring,"Commercial (Apple/CATL Si blended, Sila Nano, Amprius > 500 Wh/kg anode)"
+21. Dual-Ion & Hybrid-Ion Batteries,,,,
+Dual-Ion Battery (Graphite Both Electrodes),"Both electrodes are graphite: PF₆⁻ intercalates cathode, Li⁺ (or Na⁺) intercalates anode. ~4.5V.","No transition metal needed, potentially low cost, high voltage","Low energy density (limited by electrolyte salt concentration), electrolyte consumption",Research stage; stationary storage concept
+Dual-Carbon Battery,"Variant of dual-ion with both electrodes being different carbon forms. Anion at one, cation at other.","All-carbon electrodes, low cost, flexible chemistry, environmentally benign","Low energy density, need high-concentration electrolyte, early stage",Research stage
+Lithium-Ion Capacitor (LIC),Pre-lithiated carbon anode (LIB-like) + activated carbon cathode (EDL capacitor). 3.8V.,"High power + moderate energy density bridge between capacitor and battery, long life","Complex pre-lithiation manufacturing, lower energy than full Li-ion","Regenerative braking (Toyota hybrid), elevators, crane energy recovery"
+Sodium-Ion Capacitor (NIC),Hard carbon anode (pre-sodiated) + AC cathode. ~3.5V. Na-ion version of LIC.,"No lithium required, lower cost, high power delivery","Pre-sodiation challenges, lower energy than full Na-ion battery","Research stage; grid frequency regulation, fast-response storage"
+Sodium–Zinc Hybrid-Ion Battery,"Zn anode + Na-ion cathode (e.g., NaMnO₂). Aqueous or non-aqueous. ~1.5V.","Safe, abundant Zn and Na, no Li, promising energy density for aqueous","Electrolyte compatibility of mixed ion system, early development stage",Research stage; safe aqueous stationary storage
+Supercapacitor–Battery Hybrid,"Asymmetric design: battery electrode on one side, supercapacitor electrode on other. Various chemistries.","Bridges gap: more energy than supercap, more power than battery, long life","Complex optimization of mismatched electrode kinetics, lower energy than full battery","Grid regulation, regenerative braking, fast-charge industrial (Aowei, Skeleton)"
+22. Biological & Bio-Inspired Batteries,,,,
+Microbial Fuel Cell (MFC),"Electroactive bacteria (e.g., Geobacter, Shewanella) oxidize organic matter at anode, O₂ reduced at cathode. ~0.5–0.8V.","Self-sustaining with organic waste fuel, wastewater treatment + power generation simultaneously","Very low power density, large footprint, biofilm management, unstable long-term","Wastewater treatment plants, remote sensors, bioremediation power"
+Enzymatic Bio-Battery,Glucose oxidase (or laccase) enzyme catalyzes glucose oxidation at anode; O₂ reduction at cathode. ~0.4–0.6V.,"Operates in physiological fluids (blood, tears), biocompatible, self-powered by body fluids","Very low power (nW–μW), enzyme stability limited (weeks), short lifetime","Implantable biosensors, continuous glucose monitors, implantable micro-devices"
+Plant Microbial Fuel Cell,Plant root exudates feed bacteria in soil; MFC extracts electricity. ~0.2–0.5V per unit.,"Self-sustaining using photosynthate exudates, no external fuel, green technology","Extremely low power density, not scalable for large power, experimental","Remote environmental monitoring, agricultural sensors"
+Sediment Microbial Fuel Cell,"Buried anode in anoxic sediment, cathode in overlying aerated water. Marine/freshwater benthic MFC.","Completely self-powered from sediment organic matter, maintenance-free, long duration","Very low power (mW/m²), suitable only for ultra-low-power devices","Oceanographic sensors, underwater monitoring, benthic environmental monitoring"
+DNA/RNA-Based Electrochemical Battery,Nucleic acid-based redox systems. Early concept: G-quadruplex structures or base-redox pairs for energy storage.,"Biocompatible, nano-scale, precision molecular design, potential bioelectronics integration","Extremely early stage, no practical energy density demonstrated",Research curiosity; theoretical nano-bioelectronic energy storage
+Melanin Battery (Bioelectronic/Secondary),Eumelanin polymer stores charge via Cu²⁺/Cu⁺ or Fe³⁺/Fe²⁺ chelation in water-based electrolyte.,"Fully biodegradable, biocompatible, edible-grade, non-toxic","Very low energy density (~10 mAh/g), early research, limited cycle count","Transient bioelectronics, implantable sensors, edible sensors"
+"23. Nuclear, Radioisotope & Energy-Harvesting Batteries",,,,
+Betavoltaic Battery (Nuclear/Atomic),"β-particles from radioisotope (e.g., ⁶³Ni, ³H, ¹⁴⁶Pm) excite semiconductor p-n junction. Converts radiation → electricity.","Extremely long life (years to decades), no maintenance, very high energy density by mass over lifetime","Extremely low power (nW–μW), radioactive material handling, high cost, regulated","Pacemakers (historical), deep-space probes, remote military sensors, micro-MEMS"
+Carbon-14 Diamond Battery,¹⁴C radioactive graphite (nuclear waste) encapsulated in diamond semiconductor. Beta radiation → current.,"Uses nuclear waste as fuel, ~5730-year half-life (essentially permanent), zero moving parts","Extremely low power (~15 nW per gram of ¹⁴C), expensive diamond fabrication","Deep-space sensors, deep geological monitoring, ultra-long-life IoT (research/Arkenlight)"
+Tritium Battery (³H Betavoltaic),³H (tritium) β-decay → electrons → p-n junction current. 12.3-year half-life.,"Long operational life (decades), compact, maintenance-free","Low power density, tritium handling regulations, Bremsstrahlung radiation","Wristwatch illumination, emergency exit signs, military night sights"
+Nickel-63 Betavoltaic Battery,⁶³Ni β-decay in semiconductor (Si or wide-bandgap GaN). 100-year half-life.,"Extremely long life (~100 years usable), compact, stable output","Very low power density (nW range), expensive isotope production, regulated","Sensors in inaccessible locations, space probes, deep well monitoring"
+Radioisotope Thermoelectric Generator (RTG),Pu-238 or Sr-90 decay heat → thermoelectric converter (Seebeck effect). ~0.1–1 kW.,"Extremely reliable, decades of operation, works in extreme cold/dark (space)","Radioactive material (Pu-238), low efficiency (~6–8%), very expensive","Voyager, Cassini, New Horizons, Curiosity rover, deep-space missions"
+Photo-Rechargeable (Solar-Integrated) Battery,Photovoltaic cell integrated with battery; solar charges battery in situ. Various chemistries.,"Self-charging from sunlight, compact integrated design, suitable for remote use","Solar input dependent on irradiance, added complexity and cost vs. separate PV+battery","Remote IoT sensors, wearables, agricultural monitors, off-grid micro-devices"
+Osmotic/Blue Energy Battery,Salinity gradient between seawater and freshwater drives ion flow through selective membrane → electricity. ~0.3V/cell.,"Renewable energy from river-sea mixing, no carbon emissions, abundant resource","Low power density (~2 W/m²), membrane fouling, scaling up challenging, novel technology","River delta power generation, estuarine energy harvesting, off-grid coastal power"
+"24. Novel, Emerging & Miscellaneous Batteries",,,,
+Seawater Battery,Na extracted from seawater cathode through NASICON membrane; Na metal or carbon anode. ~3.0V.,"Uses seawater as inexhaustible cathode reservoir, scalable for marine environments","NASICON membrane stability, limited power density, corrosion management","Marine energy storage, island microgrids, AUV (UNIST Korea research)"
+Sand Battery (Thermal),Resistive heating stores electricity as heat in sand/gravel; heat engine extracts electricity or heat.,"Very low cost (sand is free), long duration storage (days-weeks), scalable","Low round-trip electrical efficiency (~30%), mainly useful as heat storage, not electricity","District heating (Finland Polar Night Energy), industrial heat buffer, seasonal storage"
+Gravity Battery (Mechanical),"Electric motor lifts mass (water, rock); generator extracts energy on descent. PHS or rail-based.","Very long life (50+ yr), no chemical degradation, abundant materials, recyclable","Site-specific (requires elevation), low energy density, slow response vs. chemical batteries","Grid long-duration storage (pumped hydro ~96% of global storage), ARES rail gravity"
+CO₂ Battery (Electrochemical),CO₂ stored as carbonate during discharge; regenerated during charge. ~2.5–3.0V.,"CO₂ sequestration + energy storage, potentially coupled to carbon capture plants","Slow CO₂ electrochemical kinetics, early stage, electrolyte management",Research stage; carbon capture + storage integration concept
+Nitrogen Battery,N₂ + 6Li → 2Li₃N (Li-N₂ concept). ~0.44V. N₂ from air.,"Uses N₂ from air (inexhaustible), ambient N₂ fixation electrochemically","Very low voltage, poor kinetics, N₂ activation is extremely challenging",Research stage; dual function (battery + N-fixation)
+Iodine Battery (Solid-State Cathode),I₂/I⁻ redox couple. Solid I₂ cathode confined in porous carbon. Aqueous or non-aqueous. ~0.5–1.3V.,"Non-toxic, abundant iodine, high theoretical capacity, stable solid-state confinement","Lower voltage than Li-ion, dissolution risk, limited energy density","Zn-I₂ aqueous grid storage (research commercializing), wearable sensors"
+Flexible/Wearable Thin-Film Battery,"Li-ion, Zn-MnO₂, or solid-state chemistry on flexible substrate (polymer, textile). Various voltages.","Conforms to curved surfaces, lightweight, integrates with wearable electronics","Lower energy density than rigid cells, manufacturing complexity, mechanical fatigue","Smartwatches, health monitors, electronic textiles, flexible IoT devices"
+Oxalate-Based Battery,"Metal oxalate (e.g., FeC₂O₄) as electrode material. Organic-inorganic hybrid.","Simple synthesis, low cost, bio-inspired organic ligand, Na/Li compatible","Low electronic conductivity, early research, limited cycle life data",Research stage; sustainable battery materials concept
+Copper–Sulfur Battery,Cu + S → Cu₂S. ~0.5–1.0V. Conversion chemistry. Abundant materials.,"Very cheap Cu and S, earth-abundant, simple chemistry","Low voltage, volume changes, early research stage",Research stage; ultra-low-cost storage concept
+Metal–Hydrogen Peroxide Battery,"Metal anode (e.g., Al, Mg, Zn) + H₂O₂ cathode in acidic or alkaline electrolyte. ~1.5–2.5V.","H₂O₂ is high-energy-density liquid oxidizer, no air required (underwater use)","H₂O₂ instability and corrosiveness, safety concerns, limited commercialization","Underwater vehicles (AUV), submarine applications (research)"
+Reserve Battery – Mg/CuCl (Military),Mg anode + CuCl cathode activated by seawater. ~1.6V. Water-activated reserve type.,"Indefinite dry shelf life, instant seawater activation, reliable pulse power","Single-use, requires seawater medium, limited to aqueous-activatable scenarios","Torpedo propulsion, missile fuzing, military sonobuoys, marine emergency beacons"
+Spin-Dependent Battery (Spintronics),Theoretical concept: spin-polarized electrons carry charge without heat loss. Spintronic materials.,Concept of near-zero resistance charge storage using electron spin states,"Purely theoretical/lab concept, no practical implementation yet",Deep research curiosity; theoretical quantum energy storage
+Perovskite-Based Solid-State Battery,"Perovskite crystal (ABO₃ or ABX₃ halide) as solid electrolyte or electrode. e.g., LLTO.","Well-studied crystal chemistry, tailorable properties, wide voltage window possible","Grain boundary conductivity limits, Ti⁴⁺ reduction issue, manufacturing challenges",Research stage; potential solid-state EV batteries if grain boundary resolved
+Anode-Free Lithium Battery (Emerging),No pre-deposited Li; bare Cu current collector plates Li from cathode during first charge.,"Maximum energy density (no excess anode material), simpler cell assembly","Critical CE challenge: Li loss per cycle, dendritic Li, short cycle life without SSE","Research (multiple groups); target application: EVs, drones, aerospace"
+Anode-Free Sodium Battery,Same concept as anode-free Li but with Na plating on bare Cu or Al current collector.,"Higher energy density than standard Na-ion, simpler manufacturing","Na more reactive than Li, worse CE, higher dendrite risk, very early stage",Research stage; next-gen Na-ion grid storage</script>
 
     <script>
-        // ============================================================
-        // BATTERY DATA 
-        // ============================================================
-        const batteryData = [
-          {
-            title: "1. Primary (Non-Rechargeable) Batteries",
-            subsections: [
-              {
-                subtitle: "1.1 Zinc-Based Primary",
-                batteries: [
-                  ["Alkaline Battery (Zn-MnO₂)", "Zn + 2MnO₂ → ZnO + Mn₂O₃ (alkaline electrolyte, KOH). Powdered Zn anode, MnO₂ cathode.", "High energy density, long shelf life, low cost, widely available, good low-temp performance", "Non-rechargeable, MnO₂ limited capacity, voltage drops under heavy load", "Flashlights, remote controls, toys, clocks, portable electronics"],
-                  ["Zinc–Carbon Battery (Leclanché Cell)", "Zn → Zn²⁺ + 2e⁻; 2MnO₂ + 2NH₄⁺ + 2e⁻ → Mn₂O₃ + 2NH₃ + H₂O. NH₄Cl/ZnCl₂ electrolyte.", "Very low cost, simple construction, globally produced", "Low energy density, poor performance in cold/heavy drain, short shelf life", "Low-drain devices: clocks, remote controls, flashlights"],
-                  ["Zinc–Chloride Battery (Heavy-Duty)", "Similar to Leclanché but ZnCl₂ electrolyte. Zn anode, MnO₂ cathode, improved current delivery.", "Better than Zn-C, improved heavy-drain, low cost", "Still inferior to alkaline, limited shelf life", "Flashlights, toys, moderate drain applications"],
-                  ["Zinc–Air Battery (Primary)", "Zn + ½O₂ → ZnO; uses atmospheric O₂ as cathode reactant. KOH electrolyte.", "Very high energy density (~1086 Wh/kg theoretical), flat discharge, long shelf life sealed", "Sensitive to humidity/CO₂, limited power output, non-rechargeable", "Hearing aids, medical devices, remote sensors"],
-                  ["Zinc–Mercuric Oxide Battery", "Zn + HgO → ZnO + Hg. KOH electrolyte. Very flat discharge curve.", "Extremely stable voltage, long shelf life, high energy density", "Mercury toxicity, environmental hazard, banned in many countries", "Historic: pacemakers, military, precision instruments (largely obsolete)"],
-                  ["Zinc–Silver Oxide Battery", "Zn + Ag₂O → ZnO + 2Ag. Alkaline electrolyte. Flat 1.55V discharge.", "High energy density, very stable voltage, compact", "High cost (silver), non-rechargeable", "Watches, hearing aids, calculators, cameras"],
-                ]
-              },
-              {
-                subtitle: "1.2 Lithium Primary",
-                batteries: [
-                  ["Lithium–MnO₂ (Li-MnO₂)", "Li + MnO₂ → LiMnO₂. Organic electrolyte (LiClO₄ in propylene carbonate). 3V nominal.", "High energy density, wide temperature range, long shelf life (10+ yr), low self-discharge", "Non-rechargeable, moderate cost, organic electrolyte flammability", "Cameras, medical devices, military, smoke detectors"],
-                  ["Lithium–CFx (Li-CFx)", "Li + (CF)ₙ → LiF + C. 2.8–3.0V. Highest gravimetric energy density of primary Li cells (~2100 Wh/kg theoretical).", "Highest energy density, ultra-low self-discharge, excellent shelf life", "Non-rechargeable, expensive, voltage delay under pulse load", "Military, aerospace, implantable medical, oceanographic sensors"],
-                  ["Lithium–FeS₂ (Li-FeS₂)", "4Li + FeS₂ → 2Li₂S + Fe. 1.5V (AA compatible). Organic electrolyte.", "Drop-in AA replacement, higher energy than alkaline, wide temp range", "Non-rechargeable, slight cost premium over alkaline", "High-performance cameras, digital devices, outdoor electronics"],
-                  ["Lithium–SOCl₂ (Li-SOCl₂)", "4Li + 2SOCl₂ → 4LiCl + S + SO₂. 3.6V. Highest volumetric energy density among primary cells.", "Extremely high energy density, widest temp range (−60 to +85°C), 20+ yr shelf life", "Non-rechargeable, toxic electrolyte, voltage delay", "Utility meters, GPS trackers, military, industrial IoT"],
-                  ["Lithium–SO₂Cl₂ (Li-SO₂Cl₂)", "2Li + SO₂Cl₂ → 2LiCl + SO₂. 3.9V, very high energy density.", "Highest voltage among primary Li, excellent low-temp performance", "Highly toxic electrolyte, pressurized cell, limited commercial use", "Specialized military and aerospace applications"],
-                  ["Lithium–SO₂ (Li-SO₂)", "2Li + 2SO₂ → Li₂S₂O₄. 2.9–3.0V. Liquid SO₂ cathode, dissolved in organic solvent.", "Excellent low-temp performance, high energy density, flat discharge", "Toxic SO₂, pressurized cell, safety concerns", "Military communications, low-temperature remote deployments"],
-                  ["Lithium–Iodine (Primary)", "2Li + I₂ → 2LiI. Solid-state. 2.8V. Forms LiI electrolyte in situ.", "Extremely high reliability, 10+ yr lifetime, hermetically sealed, self-healing electrolyte", "Very low power output (solid electrolyte limits rate)", "Cardiac pacemakers (primary application since 1972)"],
-                  ["Lithium–CuO (Li-CuO)", "2Li + CuO → Li₂O + Cu. 1.5V, high energy density.", "Long shelf life, high volumetric energy density, thermally stable", "Non-rechargeable, limited rate capability", "Military, professional electronics, remote monitoring"],
-                  ["Lithium–Silver Vanadium Oxide (Li-SVO)", "Li + Ag₂V₄O₁₁ → LiAg₂V₄O₁₁ (multi-step). 3.2V average. Hybrid cathode.", "Exceptional pulse power + high energy density, reliable over years", "High cost (silver), non-rechargeable", "Implantable cardioverter-defibrillators (ICDs), cardiac devices"],
-                  ["Lithium Metal Battery (Primary)", "Li anode + various cathodes (general). High voltage due to Li's low reduction potential (−3.04V vs SHE).", "High energy density, wide chemistry options, long shelf life", "Non-rechargeable in primary form, safety concerns with lithium metal", "Consumer electronics, military, medical, industrial"],
-                ]
-              },
-              {
-                subtitle: "1.3 Magnesium & Aluminum Primary",
-                batteries: [
-                  ["Magnesium Primary (Mg-MnO₂)", "Mg + MnO₂ → MgO + Mn. 1.6–2.0V. Seawater or salt electrolyte.", "Higher voltage than Zn-C, long shelf life, lightweight", "Self-discharge in humid air, voltage delay, limited temp range", "Military, reserve applications, emergency use"],
-                  ["Magnesium–Silver Chloride (Water-Activated)", "Mg + 2AgCl → MgCl₂ + 2Ag. Seawater electrolyte activates on immersion. 1.5V.", "Indefinite shelf life (dry), immediate activation in seawater, high power density", "Single-use, requires seawater, not rechargeable", "Naval torpedoes, sonobuoys, underwater emergency beacons"],
-                  ["Zinc–Silver Chloride (Water-Activated)", "Zn + 2AgCl → ZnCl₂ + 2Ag. Similar to Mg-AgCl but Zn anode. 1.0V.", "Long dry shelf life, reliable seawater activation", "Lower energy than Mg-AgCl, single-use", "Marine rescue beacons, underwater sensors, sonobuoys"],
-                  ["Aluminum–Air Battery (Primary)", "Al + 3/4O₂ + 3/2H₂O → Al(OH)₃. 1.2–1.6V. High theoretical energy density (~8100 Wh/kg).", "Extremely high energy density, abundant aluminum, lightweight", "Self-corrosion (parasitic reaction), non-rechargeable, electrolyte management", "Emergency power, military, range extenders for EVs (research)"],
-                ]
-              },
-              {
-                subtitle: "1.4 Specialty & Other Primary",
-                batteries: [
-                  ["Mercury Battery (Primary)", "Zn + HgO → ZnO + Hg. 1.35V extremely stable. KOH electrolyte.", "Perfectly flat discharge, high energy density, long shelf life", "Mercury toxicity, environmental ban in most countries, non-rechargeable", "Historic: hearing aids, military, medical (now largely banned)"],
-                  ["Silver-Oxide Battery (Primary)", "Zn + Ag₂O → ZnO + 2Ag. 1.55V flat discharge. Alkaline electrolyte.", "Very stable voltage, compact, high energy density for size", "High silver cost, non-rechargeable", "Watches, hearing aids, button cell devices"],
-                  ["Nickel Oxyhydroxide Battery", "Zn + 2NiOOH + H₂O → Zn(OH)₂ + 2Ni(OH)₂. 1.7V. Alkaline electrolyte.", "Higher voltage/power than standard alkaline, excellent for digital cameras", "Premium cost over alkaline, non-rechargeable", "Digital cameras, high-drain electronics"],
-                  ["Oxyride Battery", "Panasonic's improved alkaline using NiO(OH)/MnO₂ mixed cathode. ~1.7V initial.", "Better high-drain performance than standard alkaline", "Slightly higher cost, non-rechargeable, discontinued", "Digital cameras, high-drain portables (largely discontinued)"],
-                  ["Water-Activated Battery", "Various anodes (Mg, Al, Zn) activated by water/seawater as electrolyte.", "Unlimited shelf life (dry storage), instant field activation", "Single-use, electrolyte dependent on environment", "Emergency beacons, military, oceanographic instruments"],
-                  ["Air-Depolarized Battery", "Metal anode (typically Zn) + atmospheric O₂ cathode. General category.", "High energy density (O₂ from air, not stored), lightweight", "Limited power density, humidity sensitivity", "Long-duration remote sensors, hearing aids"],
-                  ["Thermal Reserve Battery (Pyrotechnic)", "Molten salt electrolyte activated by pyrotechnic heat source. Various chemistries (e.g., Li-FeS₂ at high temp).", "Indefinite shelf life, instant high-power activation, wide temperature range", "Single-use, activation is irreversible, requires pyrotechnic trigger", "Missiles, ejection seats, artillery fuses, aerospace"],
-                  ["Paper Battery (Primary)", "Thin cellulose substrate with Zn/MnO₂ or similar chemistry. Flexible architecture.", "Ultra-thin, flexible, biodegradable substrate, lightweight", "Low energy density, prototype stage for many variants", "RFID tags, smart packaging, disposable medical sensors"],
-                  ["Melanin Battery (Bioelectronic)", "Melanin polymer electrode (eumelanin) in aqueous electrolyte. Stores charge via ion coordination.", "Biocompatible, biodegradable, non-toxic, edible-grade materials", "Very low energy density, early research stage", "Ingestible electronics, biomedical sensors, transient devices"],
-                  ["Riboflavin (Vitamin B2) Battery", "Riboflavin as redox-active cathode material in aqueous system. ~−0.2V vs. Ag/AgCl.", "Non-toxic, biocompatible, derived from vitamin B2, safe for ingestion", "Very low performance, highly experimental", "Ingestible diagnostic sensors, bioelectronic devices"],
-                ]
-              },
-              {
-                subtitle: "1.5 Historical & Classical Cells",
-                batteries: [
-                  ["Voltaic Pile", "Zn/Cu discs with brine-soaked cloth. First true battery (Volta, 1800). Zn + Cu²⁺ → Zn²⁺ + Cu.", "First practical electrochemical power source, historically foundational", "Very low energy density, rapid polarization, not practical today", "Historical demonstrations, education"],
-                  ["Daniell Cell", "Zn | ZnSO₄ || CuSO₄ | Cu. 1.1V. First practical and reliable cell (1836).", "Stable 1.1V, non-polarizing, practical for telegraphy", "Not portable, liquid electrolyte, self-discharge", "Historic telegraphy, electroplating, educational demonstrations"],
-                  ["Gravity Cell (Crowfoot Cell)", "Variant of Daniell with ZnSO₄ floating on CuSO₄ by density. Self-maintaining.", "Low maintenance, self-restoring electrolyte gradient", "Fragile, positional dependency, obsolete", "19th-century telegraphy"],
-                  ["Grove Cell", "Zn | H₂SO₄ || HNO₃ | Pt. ~1.9V. High voltage but toxic gases.", "Very high EMF for its era, capable of high currents", "Toxic NO₂ gas evolution, platinum cathode, impractical today", "Early telegraphy, electrolysis experiments (historical)"],
-                  ["Bunsen Cell", "Zn | H₂SO₄ || HNO₃ | carbon. Cheaper Grove variant using carbon instead of Pt.", "Lower cost than Grove, adequate performance for 19th-century use", "Toxic fumes, carbon electrode, obsolete", "Arc lamps, early electrochemistry (historical)"],
-                  ["Leclanché Cell (Wet)", "Zn | NH₄Cl | MnO₂/C. 1.5V. Predecessor of Zn-C dry cell (1866).", "Practical, no precious metals, commercially viable", "Liquid electrolyte, not portable, polarizes under load", "Early telegraphy and telephony (historical)"],
-                  ["Dry Cell (General)", "Sealed Leclanché chemistry with paste electrolyte (ZnCl₂/NH₄Cl). 1.5V.", "Portable, no liquid spillage, mass-produced, low cost", "Non-rechargeable (primary), limited heavy-drain performance", "Universal portable power: flashlights, toys, remote controls"],
-                ]
-              }
-            ]
-          },
-          {
-            title: "2. Lead-Based Batteries",
-            subsections: [{
-              subtitle: "",
-              batteries: [
-                ["Lead–Acid (Flooded/Wet Cell)", "Pb + PbO₂ + 2H₂SO₄ → 2PbSO₄ + 2H₂O. 2V/cell. Flooded H₂SO₄ electrolyte.", "Very low cost, high surge current, reliable, fully recyclable (97%+)", "Heavy, low energy density, requires maintenance, H₂ gassing", "Automotive SLI, UPS, forklifts, stationary backup power"],
-                ["Deep-Cycle Lead–Acid", "Same chemistry as flooded Pb-acid but thicker plates optimized for repeated deep discharge.", "Cost-effective for deep cycling, proven reliability, recyclable", "Heavy, lower cycle life vs. Li-ion, requires ventilation", "Golf carts, marine, renewable energy storage, floor scrubbers"],
-                ["VRLA Battery", "Valve-regulated Pb-acid; recombinant O₂ cycle prevents gassing. Sealed. AGM or Gel variants.", "Maintenance-free, can be used in any orientation, low self-discharge", "Less tolerant of overcharge, thermal runaway risk, shorter life than flooded", "UPS, telecommunications, emergency lighting, medical equipment"],
-                ["AGM Lead–Acid", "Pb-acid with electrolyte absorbed in fiberglass mat. Immobilized H₂SO₄. 2V/cell.", "Spill-proof, lower internal resistance, good high-current performance", "More expensive than flooded, sensitive to overcharging", "Start-stop vehicles, marine, motorcycle, premium UPS"],
-                ["Gel Lead–Acid", "Pb-acid with silica-gelled electrolyte. Immobilized, prevents stratification.", "Excellent deep-discharge recovery, vibration resistant, safe", "Slow charge rate, higher cost, poor high-rate performance", "Wheelchairs, solar storage, marine, deep-cycle applications"],
-              ]
-            }]
-          },
-          {
-            title: "3. Nickel-Based Batteries",
-            subsections: [{
-              subtitle: "",
-              batteries: [
-                ["Nickel–Cadmium (NiCd)", "Cd + 2NiOOH + 2H₂O → Cd(OH)₂ + 2Ni(OH)₂. 1.2V. KOH electrolyte.", "Robust, tolerates overcharge/deep discharge, wide temp range, long cycle life", "Cadmium toxicity, memory effect, low energy density, banned in EU consumer use", "Power tools (legacy), aviation, emergency lighting, industrial"],
-                ["Nickel–Metal Hydride (NiMH)", "MH + NiOOH → M + Ni(OH)₂. 1.2V. AB₅ or AB₂ alloy hydrogen storage.", "Higher energy density than NiCd, no memory effect (moderate), no Cd toxicity", "Higher self-discharge than Li-ion, less energy dense than Li-ion", "HEV (Toyota Prius), consumer AA/AAA, digital cameras"],
-                ["Low Self-Discharge NiMH (LSD-NiMH)", "NiMH with modified separator/electrolyte. Eneloop-type. Retains 70–85% after 1 year.", "Ready-to-use from shelf, low self-discharge, rechargeable AA compatible", "Slightly lower capacity than standard NiMH, moderate cost", "Consumer electronics, remote controls, pre-charged retail batteries"],
-                ["Nickel–Iron (NiFe / Edison)", "Fe + 2NiOOH + 2H₂O → Fe(OH)₂ + 2Ni(OH)₂. 1.2V. KOH electrolyte.", "Extremely long life (20–50 years), rugged, tolerates abuse, uses abundant materials", "Very high self-discharge, poor low-temp performance, heavy, gasses hydrogen", "Stationary storage, off-grid solar, historic rail/mining traction"],
-                ["Nickel–Zinc (NiZn)", "Zn + 2NiOOH + H₂O → ZnO + 2Ni(OH)₂. 1.6–1.7V. Higher voltage than NiMH.", "Higher voltage (AA compatible), no cadmium, better energy density than NiCd", "Zinc electrode dendrite growth, shorter cycle life, shape change", "Power tools, AA replacement, electric bikes"],
-                ["Nickel–Hydrogen (NiH₂)", "H₂ + 2NiOOH → 2Ni(OH)₂. 1.25V. Pressurized H₂ gas anode in sealed vessel.", "Extremely long cycle life (>40,000 cycles), wide temperature range, used in space", "Very bulky (pressure vessel), extremely expensive, not practical for ground use", "Satellites (Hubble, ISS), aerospace power systems"],
-              ]
-            }]
-          },
-          {
-            title: "4. Silver-Based Batteries",
-            subsections: [{
-              subtitle: "",
-              batteries: [
-                ["Silver–Zinc Battery", "Zn + Ag₂O → ZnO + 2Ag (or AgO in 2-step). 1.5–1.86V. KOH electrolyte.", "Highest energy density of aqueous systems, flat discharge, lightweight", "Very high cost (silver), limited cycle life, zinc dendrite issues", "Aerospace, submarines, military torpedoes, satellites"],
-                ["Silver–Cadmium Battery", "Cd + 2AgO → CdO + 2Ag. 1.1–1.4V. KOH electrolyte.", "Better cycle life than Ag-Zn, reliable performance, aerospace heritage", "Cadmium toxicity, silver cost, obsolescent", "Aerospace, military (legacy), specialty applications"],
-                ["Silver–Oxide Battery (Secondary)", "Ag + Zn secondary rechargeable system. AgO/Ag₂O cathode, Zn anode. 1.5–1.8V.", "Excellent energy density for aqueous system, flat voltage", "High cost, limited cycle life, zinc electrode degradation", "Military, aerospace, specialty high-energy applications"],
-              ]
-            }]
-          },
-          {
-            title: "5. Lithium-Based Secondary Batteries",
-            subsections: [
-              {
-                subtitle: "5.1 Lithium-Ion Cathode Chemistries",
-                batteries: [
-                  ["Li-ion Battery (General)", "Li⁺ shuttles between graphite anode and oxide cathode through liquid organic electrolyte. ~3.6V nominal.", "High energy density, long cycle life, low self-discharge, no memory effect", "Flammable electrolyte, cost (cobalt), capacity fade, safety concerns", "Consumer electronics, EVs, grid storage, aerospace"],
-                  ["LCO (LiCoO₂)", "Li₁₋ₓCoO₂ + LiₓC₆ ↔ LiCoO₂ + C₆. 3.6V. Layered oxide cathode.", "High energy density, excellent cycle life, mature technology", "Cobalt cost and supply risk, thermal instability at high charge, toxic Co", "Smartphones, laptops, consumer electronics"],
-                  ["LMO (LiMn₂O₄)", "LiMn₂O₄ spinel cathode. 4.0V. Three-dimensional Li-ion diffusion pathways.", "No cobalt, lower cost, good power density, safer than LCO", "Mn dissolution at elevated temp, capacity fade, lower energy density", "Power tools, medical devices, some EV applications"],
-                  ["LFP (LiFePO₄)", "LiFePO₄ + 6C ↔ FePO₄ + LiC₆. 3.2V. Olivine structure. Very stable.", "Excellent safety, thermal stability, long cycle life (>3000 cycles), low cost", "Lower energy density than NMC/NCA, lower voltage, heavier", "EVs (Tesla LFP, BYD Blade), stationary storage, e-bikes, buses"],
-                  ["LMFP (LiMnₓFe₁₋ₓPO₄)", "Mixed Mn-Fe olivine phosphate. ~3.5–3.8V. Combines LFP safety with higher voltage of LMP.", "Higher energy density than LFP, better voltage, improved safety vs. NMC", "Less commercial maturity than LFP, Mn dissolution risk", "Next-gen EVs, stationary storage (emerging)"],
-                  ["NMC (LiNiₓMnᵧCoᵤO₂)", "Layered oxide with Ni-Mn-Co in various ratios (111, 532, 622, 811). 3.6–3.7V.", "High energy density, good balance of cost/safety/performance, dominant EV chemistry", "Cobalt content (reducing in 8xx), thermal runaway risk at high SOC", "EVs (most major OEMs), laptops, power tools, grid storage"],
-                  ["NCA (LiNi₀.₈Co₀.₁₅Al₀.₀₅O₂)", "Layered oxide with Al doping for stability. 3.65V. Used by Tesla/Panasonic.", "Very high energy density, long cycle life, good power", "Less thermally stable than NMC, requires precise charging management", "Tesla EVs, power tools, aerospace"],
-                  ["LTO (Li₄Ti₅O₁₂)", "Li₄Ti₅O₁₂ anode (zero strain) + various cathodes. 2.4V (vs. LFP). 1.5V nominal.", "Extremely long cycle life (>10,000), ultra-fast charge (10C), wide temp range, very safe", "Low energy density (~60–80 Wh/kg), higher cost, lower voltage", "Grid frequency regulation, buses, fast-charge stations, industrial"],
-                ]
-              },
-              {
-                subtitle: "5.2 Lithium Metal & Polymer",
-                batteries: [
-                  ["Lithium Metal Battery (Secondary)", "Li metal anode replaces graphite. Much higher energy density due to Li's high capacity (3860 mAh/g).", "Up to 2× energy density of Li-ion, high specific energy, lightweight", "Lithium dendrite formation → short circuit/fire, low coulombic efficiency, challenging electrolyte", "Research EVs, aerospace, next-gen portable (under development)"],
-                  ["Lithium Polymer (LiPo)", "Li-ion with gel polymer electrolyte (PEO/PVDF). Flexible pouch format. 3.7V.", "Flexible form factor, thin profile, lightweight, no liquid leakage risk", "Less energy dense than liquid Li-ion, requires protection circuit, swelling risk", "Drones, smartphones, RC vehicles, wearables"],
-                  ["Lithium–Silicon Battery", "Si anode (theoretical 3579 mAh/g vs. 372 mAh/g graphite) + standard Li-ion cathode. ~3.6V.", "Potentially 40% higher energy density than graphite Li-ion", "Si volume expansion (~300%), cracking, SEI instability, capacity fade", "Next-gen EVs (Sila Nano, Amprius), wearables (emerging)"],
-                  ["Thin-Film Li-ion Battery", "Sputtered ceramic electrolyte (LiPON) on substrate. μm-thick. All-solid, flexible.", "Extremely thin, flexible, long cycle life, solid electrolyte, safe", "Very low capacity (μAh range), expensive deposition process", "RFID, cardiac monitors, micro-sensors, smart cards"],
-                ]
-              },
-              {
-                subtitle: "5.3 Lithium Conversion & Beyond-Intercalation",
-                batteries: [
-                  ["Lithium–Sulfur (Li-S)", "2Li + S ↔ Li₂S. 2.1V average. Very high theoretical energy (2600 Wh/kg).", "~5× energy density of Li-ion theoretically, abundant/cheap sulfur, lightweight", "Polysulfide shuttle, volume expansion, poor cycle life, self-discharge", "Aerospace (Airbus research), drones, long-range EVs (development)"],
-                  ["Lithium–Air Battery", "Li + O₂ (from air) → Li₂O₂/Li₂O. Variant using ambient air including CO₂/H₂O.", "Ultimate energy density potential, uses air as cathode reactant", "CO₂/H₂O contaminants reduce performance, kinetics, dendrites — significant challenges", "Research stage only; future EVs and aviation (theoretical)"],
-                ]
-              }
-            ]
-          },
-          {
-            title: "6. All-Solid-State Batteries",
-            subsections: [{
-              subtitle: "",
-              batteries: [
-                ["Solid-State Battery (General)", "Replace liquid electrolyte with solid ionic conductor (oxide, sulfide, polymer, halide). Li⁺ transport in solid.", "No flammable liquid, enables Li metal anode, potentially higher energy density, wider temp range", "Lower ionic conductivity than liquid (improving), interfacial resistance, manufacturing scale-up", "EVs (Toyota, Solid Power), medical implants, aerospace (near-term commercialization)"],
-                ["SSB – Oxide (LLZO, LATP)", "Li₇La₃Zr₂O₁₂ (LLZO) or Li₁.₃Al₀.₃Ti₁.₇(PO₄)₃ (LATP). Ceramic pellet electrolyte.", "High electrochemical stability, wide voltage window, chemically stable", "Brittle, poor interfacial contact, requires high-pressure sintering, difficult to scale", "Medical implants, aerospace, small-format (research + emerging commercial)"],
-                ["SSB – Sulfide (Li₆PS₅Cl)", "Li₆PS₅Cl (argyrodite) or Li₁₀GeP₂S₁₂ (LGPS). High ionic conductivity (~10⁻² S/cm).", "Highest ionic conductivity of solid electrolytes, room-temperature operation, processable", "Air/moisture sensitivity, narrow electrochemical window, H₂S release if exposed to water", "EVs (Samsung SDI, Toyota 2027 target), portable electronics"],
-                ["SSB – Polymer (PEO)", "Poly(ethylene oxide) + Li salt. Li⁺ transport via polymer chain segmental motion. ~60–80°C operation.", "Flexible, lightweight, easy manufacturing, thin-film compatible", "Requires elevated temperature for adequate conductivity, narrow voltage window", "Bolloré Bluecar EV (deployed), medical implants, thin-film cells"],
-              ]
-            }]
-          },
-          {
-            title: "7. Sodium-Based Batteries",
-            subsections: [{
-              subtitle: "",
-              batteries: [
-                ["Sodium-Ion Battery (Na-ion)", "Na⁺ intercalation between hard carbon anode and layered oxide/Prussian blue cathode. ~3.2V.", "Abundant/cheap Na, no Li/Co required, similar manufacturing to Li-ion, safe", "Lower energy density than Li-ion, larger Na⁺ ion limits electrode choices", "Grid storage, low-cost EVs (CATL Na-ion 2023), two-wheelers, off-grid"],
-                ["Sodium–Sulfur (High-Temp)", "2Na + S ↔ Na₂Sₓ. 300–350°C operation. Molten Na/S with β-alumina solid electrolyte. 2.1V.", "Very high energy density, high efficiency, no self-discharge, long life (NGK >4500 cycles)", "Requires thermal management (300°C), sodium fire risk if seal fails, large format only", "Grid-scale energy storage (NGK Insulators), wind/solar firming"],
-                ["Sodium–Metal Chloride (ZEBRA)", "Na + NiCl₂ ↔ NaCl + Ni. 2.58V. 270–350°C. β-alumina electrolyte.", "High energy density (for high-temp), safer than Na-S (solid reaction products), tolerates overcharge", "High operating temperature, thermal management needed, large/heavy", "EV buses (FIAMM), stationary storage, marine, grid backup"],
-              ]
-            }]
-          },
-          {
-            title: "8. Zinc-Based Batteries",
-            subsections: [{
-              subtitle: "",
-              batteries: [
-                ["Zinc-Ion Battery (Zn-ion)", "Zn²⁺ intercalation in MnO₂ or V₂O₅ cathode. Zn metal anode. Mild aqueous ZnSO₄ electrolyte. ~1.2–1.4V.", "Safe aqueous electrolyte, Zn abundant and cheap, recyclable, non-toxic", "Zn dendrite growth, cathode dissolution, limited energy density, limited cycle life", "Grid storage, consumer electronics, stationary backup (commercializing)"],
-                ["Zinc–Air Battery (Secondary)", "Zn + O₂ → ZnO (discharge); ZnO + 2e⁻ → Zn + O²⁻ (charge). ~1.65V. KOH electrolyte.", "Very high energy density, O₂ from air (lightweight), Zn abundant", "Slow ORR/OER kinetics, CO₂ degradation of KOH, Zn dendrites on charge", "Grid storage (Eos Energy, Form Energy research), EV range extenders"],
-                ["Zinc–Bromine Battery (Zn-Br₂)", "Zn + Br₂ ↔ ZnBr₂. ~1.8V. Flow or static. Aqueous ZnBr₂ electrolyte.", "High energy density for aqueous flow, low cost, good efficiency", "Bromine toxicity and vapor pressure, corrosion, complex sealing", "Grid storage (Redflow ZBM), remote area power, solar firming"],
-              ]
-            }]
-          },
-          {
-            title: "9. Redox Flow Batteries",
-            subsections: [{
-              subtitle: "",
-              batteries: [
-                ["Vanadium Redox Flow Battery (VRFB)", "V²⁺/V³⁺ (negative) + V⁴⁺/V⁵⁺ (VO²⁺/VO₂⁺) (positive) in H₂SO₄. ~1.4V. All-vanadium prevents cross-contamination.", "Long cycle life (>20,000), independent energy/power scaling, no cross-contamination, fully reversible", "Vanadium cost and supply, large footprint, low energy density (~25 Wh/L)", "Grid storage (Rongke Power 200 MWh China, Bushveld, Invinity), microgrids, island storage"],
-                ["Iron–Chromium Flow Battery", "Fe³⁺/Fe²⁺ | Cr³⁺/Cr²⁺ in HCl. ~1.0V. Low-cost materials.", "Very low material cost, non-toxic, long duration capable", "Cross-contamination over time, Cr kinetics slow, lower voltage", "Grid storage (EnerVault, Sumitomo), long-duration energy storage"],
-                ["Organic Redox Flow Battery (Quinone)", "Anthraquinone-2,7-disulfonate (AQDS)/HBr or ferrocyanide/DHAQ pairs. ~0.8–1.0V.", "Low-cost organic molecules, no rare metals, water-based, safer than Br-based", "Lower energy density, molecule degradation, stability over long duration", "Research stage; Harvard/MIT groups, future low-cost grid storage"],
-                ["All-Iron Flow Battery", "Fe³⁺/Fe²⁺ (positive) + Fe²⁺/Fe⁰ (negative). Aqueous FeCl₂. ~1.2V.", "Very cheap (FeCl₂), non-toxic, single-element (no cross-contamination), abundant", "Fe plating side concerns, acidic electrolyte, lower energy density than VRFB", "Commercial grid (ESS Inc. Energy Warehouse), microgrids"],
-              ]
-            }]
-          },
-          {
-            title: "10. Other Emerging Chemistries",
-            subsections: [{
-              subtitle: "",
-              batteries: [
-                ["Iron–Air Battery", "Fe + O₂ + H₂O → Fe(OH)₂/Fe₂O₃. ~1.28V. KOH electrolyte. Very abundant Fe.", "Extremely cheap (Fe and air), high theoretical energy density (~764 Wh/kg), non-toxic", "Low round-trip efficiency (~50%), slow kinetics, Fe electrode passivation, parasitic H₂ evolution", "Long-duration grid storage (Form Energy 100-hour battery commercial 2024)"],
-                ["Aluminum-Ion Battery (Al-ion)", "Al ↔ Al³⁺ + 3e⁻. AlCl₄⁻ intercalates into graphite cathode in ionic liquid (AlCl₃/[EMIm]Cl). ~2.0V.", "Al abundant/cheap (3rd most abundant element), trivalent (3e⁻/ion), fast charge capability, safe", "Ionic liquid electrolyte cost, low energy density, cathode limited options, HCl corrosion risk", "Research stage; MIT/Stanford demos, fast-charge niche applications"],
-                ["Potassium-Ion Battery (K-ion)", "K⁺ intercalation in graphite anode (KC₈, higher capacity than Na in graphite) and Prussian blue/organic cathode. ~3.7V.", "Abundant K, graphite anode works well (unlike Na), low-cost materials, high voltage", "K metal reactivity, limited cathode options, early commercialization stage", "Research stage; future low-cost stationary storage"],
-                ["Liquid Metal Battery (General)", "Liquid metal anode (e.g., Li, Mg) | molten salt electrolyte | liquid metal alloy cathode (e.g., Sb, Bi). Self-stratifying by density.", "Extremely long cycle life (no solid-state degradation), low-cost materials, scalable", "High operating temperature (400–700°C), thermal management, specialized sealing", "Grid-scale storage (Ambri Inc.), industrial long-duration storage"],
-              ]
-            }]
-          }
-        ];
+        lucide.createIcons();
 
-        // ============================================================
-        // APPLICATION STATE & LOGIC
-        // ============================================================
-        let searchTerm = '';
-        let isSidebarOpen = false;
-        let activeSectionId = '';
-
-        const sidebarElement = document.getElementById('sidebar');
-        const overlayElement = document.getElementById('mobile-overlay');
-        const menuIconElement = document.getElementById('menu-icon');
-        const searchInput = document.getElementById('search-input');
-        const clearSearchBtn = document.getElementById('clear-search');
-        const contentContainer = document.getElementById('content-container');
-        const sidebarNavContainer = document.getElementById('sidebar-nav');
-        const scrollTopBtn = document.getElementById('scroll-top-btn');
-
-        // Derived filtered data
-        function getFilteredData() {
-            if (!searchTerm.trim()) return batteryData;
-            
-            const lowerTerm = searchTerm.toLowerCase();
-            return batteryData.map(section => {
-                const isSectionMatch = section.title.toLowerCase().includes(lowerTerm);
-                
-                const filteredSubsections = section.subsections.map(sub => {
-                    const isSubMatch = sub.subtitle && sub.subtitle.toLowerCase().includes(lowerTerm);
-                    
-                    const filteredBatteries = sub.batteries.filter(battery => 
-                        battery.some(field => field.toLowerCase().includes(lowerTerm))
-                    );
-
-                    if (isSectionMatch || isSubMatch) {
-                        return sub;
-                    } else if (filteredBatteries.length > 0) {
-                        return { ...sub, batteries: filteredBatteries };
-                    }
-                    return null;
-                }).filter(Boolean);
-
-                if (isSectionMatch || filteredSubsections.length > 0) {
-                    return { ...section, subsections: filteredSubsections };
+        // CSV Parser
+        function parseCSV(text) {
+            const rows = [];
+            let currentRow = [];
+            let currentCell = '';
+            let inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (inQuotes) {
+                    if (char === '"' && text[i+1] === '"') {
+                        currentCell += '"'; 
+                        i++; 
+                    } else if (char === '"') {
+                        inQuotes = false;
+                    } else { currentCell += char; }
+                } else {
+                    if (char === '"') { inQuotes = true; } 
+                    else if (char === ',') { currentRow.push(currentCell.trim()); currentCell = ''; } 
+                    else if (char === '\n' || char === '\r') {
+                        if (char === '\r' && text[i+1] === '\n') i++; 
+                        currentRow.push(currentCell.trim());
+                        if (currentRow.some(c => c)) rows.push(currentRow); 
+                        currentRow = []; currentCell = '';
+                    } else { currentCell += char; }
                 }
-                return null;
-            }).filter(Boolean);
-        }
-
-        function scrollToSection(id) {
-            const el = document.getElementById(id);
-            if (el) {
-                window.scrollTo({
-                    top: el.offsetTop - 80,
-                    behavior: 'smooth'
-                });
-                if (isSidebarOpen) toggleSidebar();
             }
+            if (currentCell || currentRow.length > 0) {
+                currentRow.push(currentCell.trim()); rows.push(currentRow);
+            }
+            return rows;
         }
 
-        // Render Sidebar Navigation
-        function renderSidebarNav() {
-            let html = '';
-            batteryData.forEach((section, idx) => {
-                const id = `section-${idx}`;
-                const isActive = activeSectionId === id;
+        let activeCategory = 'all';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const rawCSV = document.getElementById('csv-data').textContent.trim();
+            const rows = parseCSV(rawCSV);
+            const tableBody = document.getElementById('tableBody');
+            const sidebar = document.getElementById('categorySidebar');
+            
+            let currentMainCategory = '';
+
+            // Render 'All Categories' Button
+            const allBtn = document.createElement('button');
+            allBtn.className = 'w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors sidebar-btn bg-blue-50 text-blue-700 shadow-sm';
+            allBtn.innerHTML = `<span class="flex items-center"><i data-lucide="layers" class="w-4 h-4 mr-2"></i> All Categories</span>`;
+            allBtn.dataset.category = 'all';
+            sidebar.appendChild(allBtn);
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row[0]) continue; 
                 
-                html += `
-                    <button
-                        onclick="scrollToSection('${id}')"
-                        id="nav-link-${id}"
-                        class="text-left px-3 py-2.5 rounded-lg text-sm transition-all flex items-start gap-2 group nav-link
-                        ${isActive ? 'bg-[#2E75B6] text-white shadow-md shadow-blue-900/10' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}"
-                    >
-                        <i data-lucide="chevron-right" class="w-4 h-4 shrink-0 mt-0.5 transition-transform ${isActive ? 'rotate-90' : 'group-hover:translate-x-0.5'}"></i>
-                        <span class="leading-tight">${section.title}</span>
-                    </button>
-                `;
-            });
-            sidebarNavContainer.innerHTML = html;
-        }
+                // Identify Categories (Only column 0 has data)
+                if (row.length >= 1 && (!row[1] && !row[2] && !row[3])) {
+                    const catName = row[0];
+                    const isSub = /^\d+\.\d+/.test(catName); // e.g. "1.1"
 
-        // Render Main Content
-        function renderContent() {
-            const filteredData = getFilteredData();
-            let html = '';
+                    if (!isSub) {
+                        currentMainCategory = catName;
+                        
+                        // Add Sidebar Button for Main Categories
+                        const btn = document.createElement('button');
+                        btn.className = 'w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100 hover:text-slate-900 sidebar-btn mt-1 truncate';
+                        btn.textContent = catName.replace(/^\d+\.\s/, ''); // Optional: Strip numbers for cleaner look, left intact here for context
+                        btn.dataset.category = currentMainCategory;
+                        sidebar.appendChild(btn);
+                    }
 
-            if (filteredData.length === 0) {
-                html = `
-                    <div class="text-center py-20">
-                        <div class="bg-slate-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="search" class="w-10 h-10 text-slate-400"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-slate-700 mb-2">No results found</h3>
-                        <p class="text-slate-500 max-w-sm mx-auto">We couldn't find any battery chemistries matching "${searchTerm}". Try adjusting your search terms.</p>
-                    </div>
-                `;
-            } else {
-                filteredData.forEach((section, sIdx) => {
-                    const originalIndex = batteryData.findIndex(s => s.title === section.title);
-                    html += `
-                        <section id="section-${originalIndex}" class="scroll-mt-24">
-                            <div class="bg-[#2E75B6] rounded-t-xl px-6 py-4 shadow-sm flex items-center gap-3 relative overflow-hidden">
-                                <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white/10 to-transparent pointer-events-none"></div>
-                                <i data-lucide="zap" class="text-white/80 w-6 h-6"></i>
-                                <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight">${section.title}</h2>
-                            </div>
-                            <div class="bg-white border border-t-0 border-slate-200 rounded-b-xl shadow-sm overflow-hidden">
+                    // Render Category Header Row in Table
+                    const tr = document.createElement('tr');
+                    tr.className = `searchable-row category-row bg-slate-50 ${isSub ? 'border-t border-slate-200' : 'border-t-2 border-slate-300'} transition-colors`;
+                    tr.dataset.mainCategory = currentMainCategory;
+                    tr.innerHTML = `
+                        <td colspan="5" class="${isSub ? 'pl-8 py-2 text-sm text-slate-600' : 'pl-4 py-3 text-base text-slate-800'} font-semibold">
+                            <span class="flex items-center">
+                                ${isSub ? '<i data-lucide="corner-down-right" class="w-4 h-4 mr-2 text-slate-400"></i>' : '<i data-lucide="folder" class="w-5 h-5 mr-2 text-blue-500"></i>'}
+                                ${catName}
+                            </span>
+                        </td>
                     `;
-
-                    section.subsections.forEach(sub => {
-                        html += `<div class="mb-0">`;
-                        if (sub.subtitle) {
-                            html += `
-                                <div class="bg-[#BDD7EE]/40 px-6 py-3 border-y border-slate-200 first:border-t-0 flex items-center gap-2">
-                                    <div class="w-1.5 h-1.5 rounded-full bg-[#1F3864]"></div>
-                                    <h3 class="text-lg font-semibold text-[#1F3864]">${sub.subtitle}</h3>
-                                </div>
-                            `;
-                        }
-
-                        html += `
-                            <div class="overflow-x-auto w-full">
-                                <table class="w-full text-left border-collapse min-w-[800px]">
-                                    <thead>
-                                        <tr class="bg-slate-50 border-b-2 border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-bold">
-                                            <th class="py-3 px-4 w-1/5">Chemistry / Name</th>
-                                            <th class="py-3 px-4 w-1/4">Description & Formula</th>
-                                            <th class="py-3 px-4 w-1/5">Key Advantages</th>
-                                            <th class="py-3 px-4 w-1/5">Key Disadvantages</th>
-                                            <th class="py-3 px-4 w-1/5">Applications</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                        `;
-
-                        sub.batteries.forEach((bat, bIdx) => {
-                            const bgClass = bIdx % 2 === 0 ? 'bg-white' : 'bg-[#EBF3FB]/30';
-                            html += `
-                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors ${bgClass}">
-                                    <td class="py-4 px-4 align-top w-1/5">
-                                        <div class="font-bold text-[#1F3864] mb-1">${bat[0]}</div>
-                                    </td>
-                                    <td class="py-4 px-4 align-top w-1/4">
-                                        <p class="text-slate-700 text-sm leading-relaxed">${bat[1]}</p>
-                                    </td>
-                                    <td class="py-4 px-4 align-top w-1/5">
-                                        <div class="flex items-start gap-2">
-                                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
-                                            <p class="text-slate-700 text-sm">${bat[2]}</p>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-4 align-top w-1/5">
-                                        <div class="flex items-start gap-2">
-                                            <i data-lucide="shield-alert" class="w-4 h-4 text-rose-500 shrink-0 mt-0.5"></i>
-                                            <p class="text-slate-700 text-sm">${bat[3]}</p>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-4 align-top w-1/5">
-                                        <p class="text-slate-700 text-sm italic">${bat[4]}</p>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-
-                        html += `
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>`;
-                    });
-
-                    html += `</div></section>`;
-                });
-            }
-
-            contentContainer.innerHTML = html;
-            // Always re-initialize icons after DOM mutation
-            lucide.createIcons();
-        }
-
-        // Sidebar Toggle
-        function toggleSidebar() {
-            isSidebarOpen = !isSidebarOpen;
-            
-            if (isSidebarOpen) {
-                sidebarElement.classList.remove('-translate-x-full');
-                overlayElement.classList.remove('hidden');
-                menuIconElement.setAttribute('data-lucide', 'x');
-            } else {
-                sidebarElement.classList.add('-translate-x-full');
-                overlayElement.classList.add('hidden');
-                menuIconElement.setAttribute('data-lucide', 'menu');
-            }
-            lucide.createIcons(); // Update the menu/x icon
-        }
-
-        // Scroll Spy Update Logic (Updates Nav purely via DOM classes to avoid full re-render)
-        function updateScrollSpy() {
-            const sections = document.querySelectorAll('section[id]');
-            let currentId = '';
-            
-            for (const section of sections) {
-                const rect = section.getBoundingClientRect();
-                if (rect.top <= 150 && rect.bottom >= 150) {
-                    currentId = section.id;
-                    break;
+                    tableBody.appendChild(tr);
+                } 
+                // Render Item Row
+                else if (row.length >= 5) {
+                    const tr = document.createElement('tr');
+                    tr.className = "searchable-row item-row hover:bg-slate-50/50 transition-colors row-enter";
+                    tr.dataset.mainCategory = currentMainCategory;
+                    tr.dataset.searchText = row.join(' ').toLowerCase();
+                    
+                    const [name, desc, adv, disadv, app] = row;
+                    
+                    tr.innerHTML = `
+                        <td class="px-4 py-4 text-sm font-medium text-slate-900 align-top max-w-[200px]">${name}</td>
+                        <td class="px-4 py-4 text-sm text-slate-600 align-top max-w-[300px]">${desc}</td>
+                        <td class="px-4 py-4 text-sm text-green-700 align-top max-w-[250px]">
+                            <ul class="list-disc pl-4 space-y-1">${adv.split(',').map(s => s.trim()).filter(s => s).map(s => `<li>${s}</li>`).join('')}</ul>
+                        </td>
+                        <td class="px-4 py-4 text-sm text-red-700 align-top max-w-[250px]">
+                            <ul class="list-disc pl-4 space-y-1">${disadv.split(',').map(s => s.trim()).filter(s => s).map(s => `<li>${s}</li>`).join('')}</ul>
+                        </td>
+                        <td class="px-4 py-4 text-sm text-slate-600 align-top max-w-[200px]">${app}</td>
+                    `;
+                    tableBody.appendChild(tr);
                 }
             }
+
+            lucide.createIcons();
             
-            if (currentId !== activeSectionId) {
-                activeSectionId = currentId;
-                
-                // Reset all nav links
-                document.querySelectorAll('.nav-link').forEach(link => {
-                    link.className = 'text-left px-3 py-2.5 rounded-lg text-sm transition-all flex items-start gap-2 group nav-link text-slate-600 hover:bg-slate-100 hover:text-slate-900';
-                    const icon = link.querySelector('svg');
-                    if (icon) icon.classList.remove('rotate-90');
+            // Sidebar Event Listeners
+            document.querySelectorAll('.sidebar-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.sidebar-btn').forEach(b => {
+                        b.classList.remove('bg-blue-50', 'text-blue-700', 'shadow-sm');
+                        b.classList.add('text-slate-600', 'hover:bg-slate-100', 'hover:text-slate-900');
+                    });
+                    
+                    const target = e.currentTarget;
+                    target.classList.remove('text-slate-600', 'hover:bg-slate-100', 'hover:text-slate-900');
+                    target.classList.add('bg-blue-50', 'text-blue-700', 'shadow-sm');
+                    
+                    activeCategory = target.dataset.category;
+                    
+                    // Update main title
+                    const titleEl = document.getElementById('currentCategoryTitle');
+                    titleEl.innerHTML = activeCategory === 'all' ? 'All Categories' : activeCategory;
+
+                    filterTable();
                 });
+            });
+
+            // Search Event Listener
+            document.getElementById('searchInput').addEventListener('keyup', filterTable);
+            
+            // Initial filter run
+            filterTable();
+        });
+
+        // Global function to reset filters from empty state button
+        window.clearSearchAndFilters = function() {
+            document.getElementById('searchInput').value = '';
+            document.querySelector('[data-category="all"]').click();
+        }
+
+        function filterTable() {
+            const term = document.getElementById('searchInput').value.toLowerCase().trim();
+            let visibleItemsCount = 0;
+            let anyItemsVisible = false;
+            
+            const allRows = document.querySelectorAll('.searchable-row');
+            
+            allRows.forEach(row => {
+                const rowMainCat = row.dataset.mainCategory;
+                const isCatRow = row.classList.contains('category-row');
                 
-                // Highlight active link
-                if (activeSectionId) {
-                    const activeLink = document.getElementById(`nav-link-${activeSectionId}`);
-                    if (activeLink) {
-                        activeLink.className = 'text-left px-3 py-2.5 rounded-lg text-sm transition-all flex items-start gap-2 group nav-link bg-[#2E75B6] text-white shadow-md shadow-blue-900/10';
-                        const icon = activeLink.querySelector('svg');
-                        if (icon) icon.classList.add('rotate-90');
+                // Determine if row falls under the actively selected sidebar category
+                const matchesCategory = (activeCategory === 'all' || rowMainCat === activeCategory);
+                
+                if (isCatRow) {
+                    // Hide category divider rows completely if the user is typing a search term, 
+                    // otherwise show them if they belong to the selected sidebar category.
+                    if (term !== '') {
+                        row.style.display = 'none';
+                    } else {
+                        row.style.display = matchesCategory ? '' : 'none';
+                    }
+                } else {
+                    // Filter normal item rows
+                    const matchesSearch = row.dataset.searchText.includes(term);
+                    const shouldShow = matchesCategory && matchesSearch;
+                    
+                    row.style.display = shouldShow ? '' : 'none';
+                    
+                    if (shouldShow) {
+                        visibleItemsCount++;
+                        anyItemsVisible = true;
                     }
                 }
+            });
+
+            const emptyState = document.getElementById('emptyState');
+            const countLabel = document.getElementById('resultsCount');
+            
+            if (anyItemsVisible) {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+                countLabel.textContent = `Showing ${visibleItemsCount} matches`;
+            } else {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                countLabel.textContent = `0 matches`;
             }
         }
-
-        // Event Listeners
-        searchInput.addEventListener('input', (e) => {
-            searchTerm = e.target.value;
-            if (searchTerm) {
-                clearSearchBtn.classList.remove('hidden');
-            } else {
-                clearSearchBtn.classList.add('hidden');
-            }
-            renderContent();
-        });
-
-        clearSearchBtn.addEventListener('click', () => {
-            searchTerm = '';
-            searchInput.value = '';
-            clearSearchBtn.classList.add('hidden');
-            renderContent();
-        });
-
-        document.getElementById('mobile-menu-btn').addEventListener('click', toggleSidebar);
-        overlayElement.addEventListener('click', toggleSidebar);
-        
-        scrollTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        window.addEventListener('scroll', () => {
-            // Scroll to Top visibility
-            if (window.scrollY > 400) {
-                scrollTopBtn.classList.remove('opacity-0', 'invisible');
-                scrollTopBtn.classList.add('opacity-100', 'visible');
-            } else {
-                scrollTopBtn.classList.add('opacity-0', 'invisible');
-                scrollTopBtn.classList.remove('opacity-100', 'visible');
-            }
-            
-            // Scroll spy
-            updateScrollSpy();
-        }, { passive: true });
-
-        // Initialize application
-        renderSidebarNav();
-        renderContent();
-        lucide.createIcons(); // Initial icon rendering
-
     </script>
 </body>
 </html>
