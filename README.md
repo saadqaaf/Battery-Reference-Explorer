@@ -23,7 +23,7 @@ Spanning from historical cells (like the Voltaic Pile) to cutting-edge research 
 
 ## ✨ Features
 
-- **Massive Database** — 300+ battery technologies organized into 24 major categories (e.g., Lithium-Based Secondary, All-Solid-State, Redox Flow, Multivalent Ion, Biological).
+- **Massive Database** — 200+ battery technologies organized into 24 major categories (e.g., Lithium-Based Secondary, All-Solid-State, Redox Flow, Multivalent Ion, Biological).
 - **Interactive Sidebar** — Navigate instantly through main categories using an app-like, scrollable sidebar.
 - **Real-Time Search** — Filter the entire data table live by typing chemistry formulas, common names, or specific applications.
 - **Modern UI** — Clean, responsive interface that works flawlessly on desktop, tablet, and mobile devices.
